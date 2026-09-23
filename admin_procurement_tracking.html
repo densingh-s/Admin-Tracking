@@ -1,0 +1,2011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ADMIN PROCUREMENT &amp; TRACKING</title>
+<!-- Icons: Font Awesome (CDN). If it cannot load, buttons fall back to text labels. -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" onerror="document.documentElement.classList.add('no-fa')">
+<!-- Optional: SheetJS enables Excel (.xlsx) import/export. CSV always works without it. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+<style>
+:root{
+  --pri:#2596be; --pri-d:#1b7a9c; --pri-dd:#155f79; --pri-50:#eef7fb; --pri-100:#dcedf4; --pri-200:#b9dbe8;
+  --ink:#1a1a1a; --ink2:#4a5157; --ink3:#7b838a; --line:#d5dbe0; --line2:#e7eaed; --bg:#f1f4f6; --white:#fff;
+  --danger:#a23a34; --danger-l:#f8dedc; --warn-l:#f9d9d7;
+  --r:6px; --side:220px; --hdr:56px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font:14px/1.45 "Segoe UI","Helvetica Neue",Roboto,Arial,sans-serif;color:var(--ink);
+  background:linear-gradient(rgba(241,244,246,.94),rgba(241,244,246,.94)),url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27120%27%20height%3D%27120%27%3E%3Crect%20width%3D%27120%27%20height%3D%27120%27%20fill%3D%27%23f1f4f6%27/%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%23dbe6ea%27%20stroke-width%3D%271%27%3E%3Cpath%20d%3D%27M0%2060H120M60%200V120%27/%3E%3C/g%3E%3Ccircle%20cx%3D%2760%27%20cy%3D%2760%27%20r%3D%272%27%20fill%3D%27%23c7d7dd%27/%3E%3Ccircle%20cx%3D%270%27%20cy%3D%270%27%20r%3D%272%27%20fill%3D%27%23c7d7dd%27/%3E%3Ccircle%20cx%3D%27120%27%20cy%3D%270%27%20r%3D%272%27%20fill%3D%27%23c7d7dd%27/%3E%3Ccircle%20cx%3D%270%27%20cy%3D%27120%27%20r%3D%272%27%20fill%3D%27%23c7d7dd%27/%3E%3Ccircle%20cx%3D%27120%27%20cy%3D%27120%27%20r%3D%272%27%20fill%3D%27%23c7d7dd%27/%3E%3C/svg%3E") ,var(--bg);background-attachment:fixed}
+h1,h2,h3,h4{margin:0;font-weight:600}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--pri-d)}
+.hidden{display:none!important}
+.mut{color:var(--ink3)}
+.no-fa .fa-solid,.no-fa .fa-regular{display:none}
+.ib-t{display:none}.no-fa .ib-t{display:inline;font-size:11px}
+:focus-visible{outline:2px solid var(--pri);outline-offset:1px}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border:1px solid var(--line);background:#fff;border-radius:var(--r);cursor:pointer;font-size:13px;white-space:nowrap}
+.btn:hover{background:var(--pri-50);border-color:var(--pri-200)}
+.btn.primary{background:var(--pri);border-color:var(--pri);color:#fff}
+.btn.primary:hover{background:var(--pri-d)}
+.btn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn.danger:hover{background:#8a2f2a}
+.btn.sm{height:28px;padding:0 9px;font-size:12px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.ib{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:1px solid transparent;background:transparent;border-radius:4px;cursor:pointer;color:var(--ink2);font-size:12px;padding:0}
+.ib:hover:not([disabled]){background:var(--pri-100);color:var(--pri-dd)}
+.ib.del:hover:not([disabled]){background:var(--danger-l);color:var(--danger)}
+.ib[disabled]{opacity:.35;cursor:not-allowed}
+.no-fa .ib{width:auto;padding:0 3px}
+
+/* ---------- Forms ---------- */
+.field{display:flex;flex-direction:column;gap:3px;margin-bottom:12px}
+.field>label{font-size:12px;color:var(--ink2);font-weight:600}
+.field .req{color:var(--danger)}
+.inp,.sel,.txt{width:100%;height:34px;padding:0 10px;border:1px solid #c5ccd2;border-radius:var(--r);background:#fff;font-size:13px}
+.txt{height:auto;padding:8px 10px;min-height:84px;resize:vertical}
+.inp:focus,.sel:focus,.txt:focus{border-color:var(--pri);outline:2px solid var(--pri-100)}
+.inp[disabled],.sel[disabled],.txt[disabled]{background:#eef0f2;color:#80878d;cursor:not-allowed}
+.invalid{border-color:var(--danger)!important}
+.err{color:var(--danger);font-size:12px;min-height:0}
+.hint{color:var(--ink3);font-size:11.5px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 14px}
+.cnt{align-self:flex-end;font-size:11px;color:var(--ink3)}
+.chk{display:flex;align-items:center;gap:8px;font-size:13px;margin:2px 0 10px}
+
+/* ---------- Login ---------- */
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:linear-gradient(135deg,rgba(21,95,121,.94),rgba(37,150,190,.90)),url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27140%27%20height%3D%27140%27%3E%3Crect%20width%3D%27140%27%20height%3D%27140%27%20fill%3D%27%23155f79%27/%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%232596be%27%20stroke-width%3D%271%27%20opacity%3D%270.35%27%3E%3Cpath%20d%3D%27M0%2070H140M70%200V140%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2710%27%20width%3D%27120%27%20height%3D%27120%27/%3E%3C/g%3E%3Ccircle%20cx%3D%2770%27%20cy%3D%2770%27%20r%3D%272.5%27%20fill%3D%27%23eaf6fb%27%20opacity%3D%270.5%27/%3E%3C/svg%3E"),var(--pri-dd)}
+.lg-card{display:grid;grid-template-columns:1.05fr 1fr;width:min(880px,100%);background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.28)}
+.lg-brand{padding:34px 30px;color:#fff;background:linear-gradient(160deg,var(--pri-dd),var(--pri)),url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27140%27%20height%3D%27140%27%3E%3Crect%20width%3D%27140%27%20height%3D%27140%27%20fill%3D%27%23155f79%27/%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%232596be%27%20stroke-width%3D%271%27%20opacity%3D%270.35%27%3E%3Cpath%20d%3D%27M0%2070H140M70%200V140%27/%3E%3Crect%20x%3D%2710%27%20y%3D%2710%27%20width%3D%27120%27%20height%3D%27120%27/%3E%3C/g%3E%3Ccircle%20cx%3D%2770%27%20cy%3D%2770%27%20r%3D%272.5%27%20fill%3D%27%23eaf6fb%27%20opacity%3D%270.5%27/%3E%3C/svg%3E");display:flex;flex-direction:column;justify-content:space-between;gap:20px}
+.lg-brand h1{font-size:24px;line-height:1.2;letter-spacing:.2px}
+.lg-brand p{margin:10px 0 0;color:#e2f2f8;font-size:13.5px}
+.lg-brand ul{margin:0;padding:0;list-style:none;font-size:13px;color:#e2f2f8}
+.lg-brand li{display:flex;gap:9px;margin:7px 0;align-items:center}
+.lg-form{padding:34px 32px}
+.lg-form h2{font-size:19px;margin-bottom:4px}
+.lg-form .sub{color:var(--ink2);font-size:13px;margin-bottom:18px}
+.lg-links{display:flex;justify-content:space-between;margin-top:14px;font-size:13px}
+.lg-links a{cursor:pointer}
+.demo-box{margin-top:16px;border:1px dashed var(--pri-200);background:var(--pri-50);border-radius:var(--r);padding:9px 11px;font-size:12px;color:var(--ink2)}
+.demo-box b{color:var(--ink)}
+.demo-box code{background:#fff;border:1px solid var(--line);padding:0 4px;border-radius:3px}
+.ok-msg{background:var(--pri-50);border:1px solid var(--pri-200);padding:9px 11px;border-radius:var(--r);font-size:13px;margin-bottom:12px}
+.bad-msg{background:var(--danger-l);border:1px solid #e7b5b1;padding:9px 11px;border-radius:var(--r);font-size:13px;margin-bottom:12px}
+
+/* ---------- Shell ---------- */
+#shell{display:grid;grid-template-columns:var(--side) minmax(0,1fr);grid-template-rows:var(--hdr) minmax(0,1fr);height:100vh}
+body.sb-hidden #shell{grid-template-columns:0 minmax(0,1fr)}
+#hdr{grid-column:1/3;display:flex;align-items:center;gap:12px;padding:0 14px;background:#fff;border-bottom:3px solid var(--pri);z-index:30}
+#hdr .burger{font-size:16px;width:34px;height:34px}
+#hdr .title{font-weight:700;font-size:16px;letter-spacing:.3px;color:var(--ink);white-space:nowrap}
+#hdr .title i{color:var(--pri);margin-right:8px}
+#hdr .sp{flex:1}
+.hd-date{display:flex;align-items:center;gap:8px;color:var(--ink2);font-size:13px;white-space:nowrap}
+.user-chip{display:flex;align-items:center;gap:9px;padding:3px 10px 3px 4px;border:1px solid var(--line);border-radius:30px;background:#fff;cursor:pointer;position:relative}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+.uc-name{font-size:13px;font-weight:600;line-height:1.1}
+.uc-role{font-size:11px;color:var(--ink3)}
+.pop{position:absolute;right:0;top:calc(100% + 8px);min-width:230px;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.14);padding:12px;z-index:60;font-size:12.5px;cursor:default}
+.pop dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 10px}
+.pop dt{color:var(--ink3)}.pop dd{margin:0;word-break:break-all}
+#side{grid-column:1;background:#fff;border-right:1px solid var(--line);overflow-y:auto;overflow-x:hidden;padding:10px 8px;z-index:20}
+body.sb-hidden #side{display:none}
+.nav a,.nav .grp{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:var(--r);color:var(--ink);text-decoration:none;cursor:pointer;font-size:13.5px;user-select:none}
+.nav a:hover,.nav .grp:hover{background:var(--pri-50)}
+.nav a.active{background:var(--pri);color:#fff}
+.nav i.ic{width:18px;text-align:center;color:var(--pri-d)}
+.nav a.active i.ic{color:#fff}
+.nav .grp .pm{margin-left:auto;color:var(--ink3);font-weight:700;font-size:15px;line-height:1}
+.nav .sub{margin:2px 0 4px 18px;border-left:2px solid var(--pri-100);padding-left:6px}
+.nav .sub a{padding:7px 10px;font-size:13px}
+#main{grid-column:2;overflow:auto;padding:16px 18px;min-width:0}
+.ov-side{display:none}
+
+/* ---------- Page ---------- */
+.ph{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.ph h2{font-size:20px}
+.crumb{font-size:12px;color:var(--ink3);margin-bottom:2px}
+.card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:10px}
+.tab{padding:8px 16px;border:1px solid transparent;border-bottom:none;border-radius:6px 6px 0 0;cursor:pointer;background:transparent;font-size:13px;color:var(--ink2)}
+.tab.on{background:#fff;border-color:var(--line);color:var(--ink);font-weight:600;margin-bottom:-1px;box-shadow:inset 0 3px 0 var(--pri)}
+.gtool{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+.gtool .srch{position:relative;flex:0 1 260px}
+.gtool .srch i{position:absolute;left:10px;top:10px;color:var(--ink3);font-size:12px}
+.gtool .srch .inp{padding-left:30px;height:32px}
+.gtool .sel{width:auto;height:32px;min-width:110px;font-size:12.5px}
+.gtool .gr{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.menu-wrap{position:relative}
+.menu{position:absolute;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--line);border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,.14);z-index:40;min-width:150px;overflow:hidden}
+.menu button{display:flex;gap:8px;align-items:center;width:100%;border:0;background:#fff;padding:8px 12px;text-align:left;cursor:pointer;font-size:13px}
+.menu button:hover{background:var(--pri-50)}
+.menu button[disabled]{color:var(--ink3);cursor:not-allowed}
+
+/* ---------- Table ---------- */
+.tbl-wrap{position:relative;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:var(--r);max-height:calc(100vh - 262px);min-height:120px}
+table.tbl{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}
+.tbl th{position:sticky;top:0;z-index:2;background:#e9f2f6;color:var(--ink);text-align:left;font-weight:600;font-size:11px;padding:7px 4px;border-bottom:1px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;user-select:none}
+.tbl th.sortable{cursor:pointer}
+.tbl th.sortable:hover{background:var(--pri-100)}
+.tbl th .sa{color:var(--pri-d);font-size:10px;margin-left:2px}
+.tbl td{padding:5px 4px;border-top:1px solid var(--line2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+.tbl tbody tr:hover td{background:var(--pri-50)}
+.tbl td.c,.tbl th.c{text-align:center}
+.tbl td.r,.tbl th.r{text-align:right}
+.tbl td.act{text-align:center}
+.tbl td.act .ib{margin:0 -1px}
+.tbl .sel-i{width:100%;height:26px;font-size:11.5px;padding:0 2px;border:1px solid #c5ccd2;border-radius:4px;background:#fff;text-overflow:ellipsis}
+.tbl .sel-i[disabled]{background:#eef0f2;color:#80878d;cursor:not-allowed}
+.tbl .cur{color:var(--ink3);font-size:10.5px;margin-right:3px}
+@media (max-width:1279px){table.tbl{min-width:1040px}}
+@keyframes blinkRow{0%,100%{background:#fff}50%{background:var(--warn-l)}}
+tr.overdue td{animation:blinkRow 1.3s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){tr.overdue td{animation:none;background:var(--warn-l)}}
+.loading,.empty{padding:34px 10px;text-align:center;color:var(--ink3)}
+.empty i,.loading i{font-size:22px;display:block;margin-bottom:8px;color:var(--pri-200)}
+.pager{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--ink2);flex-wrap:wrap}
+.pager .sp{flex:1}
+.pager .pg{min-width:28px;height:28px;border:1px solid var(--line);background:#fff;border-radius:4px;cursor:pointer;font-size:12px}
+.pager .pg.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.pager .pg[disabled]{opacity:.4;cursor:not-allowed}
+.pager .sel{width:auto;height:28px;font-size:12px}
+
+/* ---------- Badges ---------- */
+.pr{display:inline-flex;width:22px;height:22px;align-items:center;justify-content:center;border-radius:4px;font-weight:700;font-size:12px;color:#fff}
+.pr-C{background:#1a1a1a}.pr-H{background:#555c63}.pr-M{background:var(--pri)}.pr-L{background:var(--pri-200);color:var(--ink)}
+.ap{display:inline-flex;width:20px;height:20px;align-items:center;justify-content:center;border-radius:3px;font-weight:700;font-size:11px;border:1px solid var(--line)}
+.ap-A{background:var(--pri);color:#fff;border-color:var(--pri)}.ap-R{background:#1a1a1a;color:#fff;border-color:#1a1a1a}.ap-P{background:#fff;color:var(--ink);border-color:#8b939a}
+.st{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11.5px;border:1px solid var(--line);background:#fff}
+.st-Draft{color:var(--ink2);border-style:dashed}.st-New{background:var(--pri-50);border-color:var(--pri-200)}
+.st-Pending{background:var(--pri-100)}.st-Approved{background:var(--pri-200)}.st-Assigned{background:#7fbcd4}
+.st-InProgress{background:var(--pri);color:#fff;border-color:var(--pri)}.st-Completed{background:#4a5157;color:#fff;border-color:#4a5157}
+.st-Closed{background:#1a1a1a;color:#fff;border-color:#1a1a1a}.st-Rejected{background:#fff;color:var(--ink);border-color:#1a1a1a;text-decoration:line-through}
+.chip{display:inline-block;padding:1px 8px;border-radius:10px;background:var(--pri-100);font-size:11px}
+
+/* ---------- Modal / Toast ---------- */
+.modal-ov{position:fixed;inset:0;background:rgba(20,28,34,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:200}
+.modal{background:#fff;border-radius:10px;width:min(640px,100%);max-height:calc(100vh - 32px);display:flex;flex-direction:column;box-shadow:0 16px 48px rgba(0,0,0,.35)}
+.modal.lg{width:min(860px,100%)}.modal.sm{width:min(430px,100%)}
+.m-head{padding:14px 18px;border-bottom:1px solid var(--line);border-top:4px solid var(--pri);border-radius:10px 10px 0 0}
+.m-head h3{font-size:16px}
+.m-body{padding:16px 18px;overflow:auto}
+.m-foot{padding:12px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;background:#f8fafb;border-radius:0 0 10px 10px}
+body.modal-open{overflow:hidden}
+#toasts{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:400;max-width:min(380px,calc(100vw - 32px))}
+.toast{background:#fff;border:1px solid var(--line);border-left:5px solid var(--pri);border-radius:6px;padding:10px 12px;box-shadow:0 6px 20px rgba(0,0,0,.18);font-size:13px;display:flex;gap:9px;align-items:flex-start}
+.toast.error{border-left-color:var(--danger)}.toast.info{border-left-color:#7b838a}
+.toast i{margin-top:2px}.toast.error i{color:var(--danger)}.toast.success i{color:var(--pri-d)}
+.dgrid{display:grid;grid-template-columns:150px 1fr;gap:6px 12px;font-size:13px}
+.dgrid dt{color:var(--ink3)}.dgrid dd{margin:0;word-break:break-word}
+.dbox{white-space:pre-wrap;background:#f7f9fa;border:1px solid var(--line2);border-radius:6px;padding:10px;font-size:13px;margin:6px 0 12px;max-height:180px;overflow:auto}
+.sect{font-size:12px;font-weight:700;color:var(--pri-dd);margin:14px 0 6px;border-bottom:1px solid var(--line2);padding-bottom:3px}
+.mini{width:100%;border-collapse:collapse;font-size:12px}
+.mini th{background:#eef3f6;text-align:left;padding:4px 6px}.mini td{padding:4px 6px;border-top:1px solid var(--line2)}
+.cm{border-left:3px solid var(--pri-200);padding:2px 8px;margin:5px 0;font-size:12.5px}
+.cm small{color:var(--ink3)}
+
+/* ---------- Home / Reports / Settings ---------- */
+.home-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+.welcome h2{font-size:22px;margin-bottom:4px}
+.welcome p{margin:0;color:var(--ink2)}
+.cal{width:100%;border-collapse:collapse;text-align:center;font-size:13px}
+.cal th{font-size:11.5px;color:var(--ink3);padding:6px 0;font-weight:600}
+.cal td{padding:7px 0;border-radius:6px}
+.cal td.today{background:var(--pri);color:#fff;font-weight:700}
+.cal td.dim{color:#b2b8bd}
+.cal-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.clock-card{display:flex;flex-direction:column;align-items:center;gap:8px}
+.digital{font-size:20px;font-weight:600;letter-spacing:1px}
+.rep-filters{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:10px;padding:10px 12px}
+.rep-filters .field{margin:0;min-width:140px}
+.rep-filters .inp,.rep-filters .sel{height:32px}
+.totals{display:flex;gap:16px;flex-wrap:wrap;margin:8px 0;font-size:13px}
+.totals b{font-size:14px}
+.stat-click{cursor:pointer;padding:4px 10px;border-radius:8px;border:1px solid transparent}
+.stat-click:hover{background:var(--pri-50);border-color:var(--pri-200)}
+.sum-tbl{width:100%;max-width:520px;border-collapse:collapse;font-size:13px;margin-bottom:12px}
+.sum-tbl th{background:#e9f2f6;text-align:left;padding:6px 8px}.sum-tbl td{padding:6px 8px;border-top:1px solid var(--line2)}
+.set-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px;margin-bottom:14px}
+.set-grid h3{font-size:15px;margin-bottom:10px}
+.imp-sum{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+.imp-sum div{border:1px solid var(--line);border-radius:6px;padding:6px 12px;background:#f8fafb;font-size:12px}
+.imp-sum b{display:block;font-size:17px}
+.imp-tbl-wrap{max-height:280px;overflow:auto;border:1px solid var(--line);border-radius:6px}
+.rw-ok{color:var(--pri-d)}.rw-bad{color:var(--danger)}.rw-dup{color:var(--ink3)}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--pri-200);border-top-color:var(--pri);border-radius:50%;animation:sp .8s linear infinite;vertical-align:middle}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1279px){
+  #shell{grid-template-columns:0 minmax(0,1fr)}
+  #side{position:fixed;left:0;top:var(--hdr);bottom:0;width:250px;transform:translateX(-100%);transition:transform .2s;box-shadow:4px 0 18px rgba(0,0,0,.2)}
+  body.sb-open #side{transform:none}
+  body.sb-hidden #side{display:block}
+  body.sb-open .ov-side{display:block;position:fixed;inset:var(--hdr) 0 0 0;background:rgba(0,0,0,.35);z-index:15}
+  .home-grid{grid-template-columns:1fr 1fr}.home-grid .welcome-c{grid-column:1/3}
+}
+@media (max-width:760px){
+  .lg-card{grid-template-columns:1fr}.lg-brand{display:none}
+  #hdr .title{font-size:13px;white-space:normal;line-height:1.1}
+  .hd-date,.uc-txt{display:none}
+  #main{padding:10px}
+  .row2,.row3{grid-template-columns:1fr}
+  .home-grid{grid-template-columns:1fr}.home-grid .welcome-c{grid-column:auto}
+  .gtool .srch{flex:1 1 100%}
+  .gtool .gr{margin-left:0}
+  .modal{max-height:calc(100vh - 16px)}
+  .dgrid{grid-template-columns:110px 1fr}
+  .tbl-wrap{max-height:calc(100vh - 300px)}
+}
+</style>
+</head>
+<body>
+<!-- Login screen (content rendered by Authentication section) -->
+<div id="login" class="hidden"></div>
+
+<!-- Application shell -->
+<div id="shell" class="hidden">
+  <header id="hdr">
+    <button class="ib burger" id="burger" title="Show / hide menu" aria-label="Show or hide menu"><i class="fa-solid fa-bars"></i><span class="ib-t">Menu</span></button>
+    <div class="title"><i class="fa-solid fa-boxes-packing"></i>ADMIN PROCUREMENT &amp; TRACKING</div>
+    <div class="sp"></div>
+    <div class="hd-date" title="Today's date"><i class="fa-regular fa-calendar"></i><span id="hdDate"></span><span id="hdClock" title="Current time"></span></div>
+    <div class="user-chip" id="userChip" tabindex="0" role="button" aria-label="Profile" title="Profile">
+      <div class="avatar" id="uAvatar">U</div>
+      <div class="uc-txt"><div class="uc-name" id="uName"></div><div class="uc-role" id="uRole"></div></div>
+      <div class="pop hidden" id="uPop"></div>
+    </div>
+    <button class="btn sm" id="btnLogout" title="Logout" aria-label="Logout"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></button>
+  </header>
+  <nav id="side" class="nav" aria-label="Main menu"></nav>
+  <main id="main"></main>
+</div>
+<div class="ov-side" id="ovSide"></div>
+<div id="toasts" aria-live="polite"></div>
+
+<script>
+'use strict';
+/* =====================================================================
+   ADMIN PROCUREMENT & TRACKING
+   Sections: Config | Utilities | Validation | Database Service | State |
+   Workflow | Authentication | Navigation | Masters | Ticket Requests |
+   Admin Manager | Admin Executive | Approver | Reports | Settings |
+   Import/Export
+   ===================================================================== */
+
+/* ===================== CONFIG (public values only) ===================== */
+const APP_CONFIG = {
+  APP_NAME: 'ADMIN PROCUREMENT & TRACKING',
+  SUPABASE_URL: '',          // e.g. https://xxxx.supabase.co  (public project URL) - or set in Settings > Database
+  SUPABASE_ANON_KEY: '',     // PUBLIC anon/publishable key ONLY. Never paste a service-role/secret key here.
+  API_PREFIX: '/rest/v1',    // use '' when you move to your own PostgREST server on Linux
+  LOCAL_DB_KEY: 'apt_local_db_v1',
+  CONN_KEY: 'apt_connection_v1',
+  SESSION_KEY: 'apt_session_v1',
+  DEFAULT_SESSION_MINUTES: 30,
+  PAGE_SIZE: 15
+};
+const ROLE = { REQ: 'Requestor', EXE: 'Admin Executive', MGR: 'Admin Manager', APR: 'Approver' };
+const USER_TYPES = [ROLE.REQ, ROLE.EXE, ROLE.MGR, ROLE.APR];
+const CORE_STATUSES = ['Draft', 'New', 'Pending Approval', 'Approved', 'Assigned', 'In-Progress', 'Completed', 'Closed', 'Rejected'];
+const TABLES = ['employees', 'vendors', 'categories', 'priorities', 'statuses', 'currencies', 'recurring_master', 'users', 'tickets',
+  'ticket_comments', 'ticket_assignments', 'ticket_approvals', 'ticket_status_history', 'audit_log', 'app_settings'];
+const DATA_TABLES = ['employees', 'vendors', 'categories', 'priorities', 'statuses', 'currencies', 'recurring_master', 'tickets',
+  'ticket_comments', 'ticket_assignments', 'ticket_approvals', 'ticket_status_history', 'app_settings'];
+
+function getConn() {
+  try { const c = JSON.parse(localStorage.getItem(APP_CONFIG.CONN_KEY) || 'null'); if (c) return c; } catch (e) { /* ignore */ }
+  return { mode: 'auto', url: APP_CONFIG.SUPABASE_URL, key: APP_CONFIG.SUPABASE_ANON_KEY, prefix: APP_CONFIG.API_PREFIX };
+}
+function isSecretKey(k) {
+  if (!k) return false;
+  if (/^sb_secret_/i.test(k)) return true;
+  try { const p = JSON.parse(atob(k.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))); return p.role === 'service_role'; } catch (e) { return false; }
+}
+function connMode() {
+  const c = getConn();
+  if (c.mode === 'demo') return 'demo';
+  if (c.url && c.key && !isSecretKey(c.key)) return 'cloud';
+  return 'demo';
+}
+
+/* ===================== UTILITIES ===================== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pad = n => String(n).padStart(2, '0');
+const pad4 = n => String(n).padStart(4, '0');
+const clone = o => JSON.parse(JSON.stringify(o));
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function parseD(s) { // 'YYYY-MM-DD' -> local Date
+  if (s instanceof Date) return s;
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || ''); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date(NaN);
+}
+const dstr = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const tstr = d => `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+const todayStr = () => dstr(new Date());
+function fmtD(s, long) { const d = parseD(s); if (isNaN(d)) return ''; return long ? `${pad(d.getDate())}-${MON[d.getMonth()]}-${d.getFullYear()}` : `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${String(d.getFullYear()).slice(2)}`; }
+const fmtT = s => (s || '').slice(0, 5);
+function fmtDT(iso) { const d = new Date(iso); return isNaN(d) ? '' : `${fmtD(dstr(d), true)} ${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+const money = n => Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const firstName = n => String(n || '').trim().split(/\s+/)[0] || '';
+const nowISO = () => new Date().toISOString();
+function addDays(dateStr, n) { const d = parseD(dateStr); d.setDate(d.getDate() + n); return dstr(d); }
+function addMonthsClamp(dateStr, n) {
+  const d = parseD(dateStr), day = d.getDate();
+  const t = new Date(d.getFullYear(), d.getMonth() + n, 1);
+  const last = new Date(t.getFullYear(), t.getMonth() + 1, 0).getDate();
+  t.setDate(Math.min(day, last)); return dstr(t);
+}
+const debounce = (fn, ms = 200) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+class AppError extends Error { }
+class DbError extends Error { constructor(code, msg) { super(msg); this.code = code; } }
+function friendly(e) {
+  if (e instanceof AppError) return e.message;
+  if (e instanceof DbError) {
+    if (e.code === 'DUP') return e.message || 'Duplicate record.';
+    if (e.code === 'FORBIDDEN') return 'Unauthorized action.';
+    if (e.code === 'INUSE') return 'This record is in use and cannot be deleted.';
+    if (e.code === 'NET') return 'Database connection failure. Check your internet connection or database settings.';
+    return e.message || 'The database rejected this change.';
+  }
+  console.error(e); return 'Something went wrong. Please try again.';
+}
+function download(name, content, mime) {
+  const blob = content instanceof Blob ? content : new Blob([content], { type: mime || 'text/plain' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+async function hashPin(pin, salt) {
+  const data = new TextEncoder().encode(salt + ':' + pin + ':apt');
+  if (window.crypto && crypto.subtle) {
+    const b = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, '0')).join('');
+  }
+  let h = 5381; data.forEach(b => { h = ((h << 5) + h + b) >>> 0; }); return 'f' + h.toString(16);
+}
+const rnd = () => Math.random().toString(36).slice(2, 10);
+
+/* ===================== VALIDATION ===================== */
+const V = {
+  email: s => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(s).trim()),
+  pin: s => /^\d{4}$/.test(String(s)),
+  username: s => /^[A-Za-z0-9_.]{3,20}$/.test(String(s)),
+  money: s => /^\d{1,12}(\.\d{1,2})?$/.test(String(s).trim()),
+  phone: s => /^\+?[\d\s-]{7,15}$/.test(String(s).trim()),
+  gst: s => /^\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(String(s).trim().toUpperCase()),
+  date: s => /^\d{4}-\d{2}-\d{2}$/.test(String(s)) && !isNaN(parseD(s))
+};
+function parseDateFlex(v) { // accepts yyyy-mm-dd, dd-mm-yyyy, dd/mm/yyyy, Date
+  if (v instanceof Date) return isNaN(v) ? null : dstr(v);
+  const s = String(v || '').trim(); if (!s) return '';
+  let m = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(s); if (m) return `${m[1]}-${pad(+m[2])}-${pad(+m[3])}`;
+  m = /^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/.exec(s); if (m) return `${m[3]}-${pad(+m[2])}-${pad(+m[1])}`;
+  return null;
+}
+
+/* ===================== DATABASE SERVICE =====================
+   Everything below talks to storage. The UI only calls the DB facade.
+   - LocalDB : demo mode (browser localStorage)
+   - CloudDB : Supabase / any PostgREST server (see supabase_schema.sql)
+   To move to your own Linux server later, keep the same schema on PostgreSQL + PostgREST
+   and change URL / API prefix in Settings > Database (or replace CloudDB with your own API client).
+   ===================================================================== */
+const UNIQUE = {
+  employees: [['emp_code'], ['email']], vendors: [['vendor_code']], categories: [['name']], priorities: [['name'], ['code']],
+  statuses: [['name']], currencies: [['name']], users: [['username']], app_settings: [['key']]
+};
+const CHILD_TABLES = ['ticket_comments', 'ticket_assignments', 'ticket_approvals', 'ticket_status_history'];
+
+const LocalDB = {
+  mode: 'demo', d: null,
+  async init() {
+    const raw = localStorage.getItem(APP_CONFIG.LOCAL_DB_KEY);
+    if (raw) { try { this.d = JSON.parse(raw); } catch (e) { this.d = null; } }
+    if (!this.d) { this.d = await seedLocal(); this.persist(); }
+  },
+  persist() { localStorage.setItem(APP_CONFIG.LOCAL_DB_KEY, JSON.stringify(this.d)); },
+  sync() { const raw = localStorage.getItem(APP_CONFIG.LOCAL_DB_KEY); if (raw) this.d = JSON.parse(raw); },
+  async list(t) { this.sync(); return clone(this.d.t[t] || []); },
+  uniq(t, row, selfId) {
+    const rows = this.d.t[t];
+    (UNIQUE[t] || []).forEach(cols => {
+      if (cols.some(c => row[c] == null || row[c] === '')) return;
+      const hit = rows.find(r => r.id !== selfId && cols.every(c => String(r[c]).toLowerCase() === String(row[c]).toLowerCase()));
+      if (hit) throw new DbError('DUP', `Duplicate record: ${cols.join(', ')} already exists.`);
+    });
+    if (t === 'tickets' && row.recurring_id && row.occurrence_date) {
+      const hit = rows.find(r => r.id !== selfId && r.recurring_id === row.recurring_id && r.occurrence_date === row.occurrence_date);
+      if (hit) throw new DbError('DUP', 'A ticket already exists for this recurring item and due date.');
+    }
+  },
+  async insert(t, row) {
+    this.sync(); row = clone(row); this.uniq(t, row, null);
+    const now = nowISO(); row.id = ++this.d.seq[t];
+    if (t === 'tickets') {
+      row.ticket_no = 'TKT-' + pad4(++this.d.cnt.ticket);
+      row.request_no = row.source === 'Request' ? 'REQ-' + pad4(++this.d.cnt.request) : null;
+      row.created_at = now; row.updated_at = now; row.updated_by = row.created_by; row.closed_at = null;
+    } else if (!row.created_at) row.created_at = now;
+    this.d.t[t].push(row); this.persist(); return clone(row);
+  },
+  async insertMany(t, rows) { const out = []; for (const r of rows) out.push(await this.insert(t, r)); return out; },
+  async update(t, id, patch) {
+    this.sync(); const r = this.d.t[t].find(x => x.id === id); if (!r) throw new DbError('NF', 'Record not found.');
+    const next = Object.assign({}, r, clone(patch)); this.uniq(t, next, id);
+    Object.assign(r, clone(patch)); if (t === 'tickets') r.updated_at = nowISO();
+    this.persist(); return clone(r);
+  },
+  async remove(t, id) {
+    this.sync(); this.d.t[t] = this.d.t[t].filter(x => x.id !== id);
+    if (t === 'tickets') CHILD_TABLES.forEach(c => { this.d.t[c] = this.d.t[c].filter(x => x.ticket_id !== id); });
+    this.persist();
+  },
+  buildUser(u) {
+    const e = this.d.t.employees.find(x => x.id === u.emp_id) || {};
+    return { id: u.id, username: u.username, emp_id: u.emp_id, role: e.user_type, name: e.name, email: e.email, designation: e.designation, branch: e.branch, emp_code: e.emp_code, menu_access: u.menu_access == null ? null : u.menu_access };
+  },
+  async register({ email, username, pin }) {
+    this.sync(); const T = this.d.t; const em = email.trim().toLowerCase();
+    if (T.users.some(u => u.username.toLowerCase() === username.toLowerCase())) throw new AppError('Username already exists. Choose another username.');
+    let emp = T.employees.find(e => e.email.toLowerCase() === em);
+    if (T.users.some(u => emp && u.emp_id === emp.id)) throw new AppError('This email address is already registered.');
+    if (!T.users.length) { // first-run bootstrap: first user becomes Admin Manager
+      if (!emp) emp = await this.insert('employees', { emp_code: 'ADM001', name: username, designation: 'Admin Manager', branch: '', email: email.trim(), mobile: '', user_type: ROLE.MGR });
+      else await this.update('employees', emp.id, { user_type: ROLE.MGR });
+      this.sync();
+    } else if (!emp) throw new AppError('This email address is not in the Employee master. Please contact the Admin Manager.');
+    const salt = rnd();
+    await this.insert('users', { username, emp_id: emp.id, salt, pin_hash: await hashPin(pin, salt), active: true, failed_attempts: 0, locked_until: null, last_login: null, reset_requested: false });
+  },
+  async login(username, pin) {
+    this.sync(); const u = this.d.t.users.find(x => x.username.toLowerCase() === String(username).trim().toLowerCase());
+    if (!u) throw new AppError('Invalid username or PIN.');
+    if (u.locked_until && new Date(u.locked_until) > new Date()) throw new AppError('Account temporarily locked after failed attempts. Try again in a few minutes.');
+    if (!u.active) throw new AppError('Account is disabled. Contact the Admin Manager.');
+    if (await hashPin(pin, u.salt) !== u.pin_hash) {
+      u.failed_attempts = (u.failed_attempts || 0) + 1;
+      if (u.failed_attempts >= 5) { u.locked_until = new Date(Date.now() + 5 * 60000).toISOString(); u.failed_attempts = 0; }
+      this.persist(); throw new AppError('Invalid username or PIN.');
+    }
+    u.failed_attempts = 0; u.locked_until = null; u.last_login = nowISO(); this.persist();
+    sessionStorage.setItem(APP_CONFIG.SESSION_KEY, JSON.stringify({ uid: u.id }));
+    return this.buildUser(u);
+  },
+  async restore() {
+    this.sync(); let s; try { s = JSON.parse(sessionStorage.getItem(APP_CONFIG.SESSION_KEY) || 'null'); } catch (e) { s = null; }
+    if (!s) return null; const u = this.d.t.users.find(x => x.id === s.uid && x.active); return u ? this.buildUser(u) : null;
+  },
+  async logout() { sessionStorage.removeItem(APP_CONFIG.SESSION_KEY); },
+  async forgot(email) {
+    this.sync(); const em = email.trim().toLowerCase(); const e = this.d.t.employees.find(x => x.email.toLowerCase() === em);
+    const u = e && this.d.t.users.find(x => x.emp_id === e.id); if (!u) return false;
+    u.reset_requested = true; this.persist(); return true;
+  },
+  async listUsers() {
+    this.sync(); return this.d.t.users.map(u => { const e = this.d.t.employees.find(x => x.id === u.emp_id) || {}; return { id: u.id, username: u.username, name: e.name, email: e.email, role: e.user_type, active: u.active, last_login: u.last_login, reset_requested: !!u.reset_requested, locked: !!(u.locked_until && new Date(u.locked_until) > new Date()), menu_access: u.menu_access == null ? null : u.menu_access }; });
+  },
+  async setMenuAccess(id, arr) { this.sync(); const u = this.d.t.users.find(x => x.id === id); if (!u) throw new DbError('NF', 'Record not found.'); u.menu_access = arr; this.persist(); },
+  async resetPin(id, pin) { this.sync(); const u = this.d.t.users.find(x => x.id === id); u.salt = rnd(); u.pin_hash = await hashPin(pin, u.salt); u.reset_requested = false; u.failed_attempts = 0; u.locked_until = null; this.persist(); },
+  async setUserActive(id, active) { this.sync(); const u = this.d.t.users.find(x => x.id === id); u.active = active; this.persist(); },
+  async removeDemo() { this.sync(); TABLES.forEach(t => { this.d.t[t] = this.d.t[t].filter(r => !r.is_demo); }); this.persist(); },
+  async resetDemo() { localStorage.removeItem(APP_CONFIG.LOCAL_DB_KEY); this.d = await seedLocal(); this.persist(); },
+  async testConnection() { return { ok: true, msg: 'Demo mode: data is stored in this browser only.' }; },
+  hasDemo() { this.sync(); return TABLES.some(t => this.d.t[t].some(r => r.is_demo)); }
+};
+
+const CloudDB = {
+  mode: 'cloud', token: null,
+  cfg() { const c = getConn(); return { base: c.url.replace(/\/+$/, '') + (c.prefix ?? APP_CONFIG.API_PREFIX), key: c.key }; },
+  headers(extra) {
+    const { key } = this.cfg(); const h = Object.assign({ apikey: key, 'Content-Type': 'application/json' }, extra || {});
+    if (/^eyJ/.test(key)) h.Authorization = 'Bearer ' + key;
+    if (this.token) h['x-app-token'] = this.token;
+    return h;
+  },
+  async req(method, path, body, extra) {
+    const { base } = this.cfg(); let res;
+    try { res = await fetch(base + path, { method, headers: this.headers(extra), body: body === undefined ? undefined : JSON.stringify(body) }); }
+    catch (e) { throw new DbError('NET', 'Database connection failure.'); }
+    if (!res.ok) {
+      let j = {}; try { j = await res.json(); } catch (e) { /* ignore */ }
+      const msg = j.message || res.statusText;
+      if (j.code === '23505') throw new DbError('DUP', 'Duplicate record already exists.');
+      if (j.code === '23503') throw new DbError('INUSE', 'Record is in use.');
+      if (res.status === 401 || res.status === 403 || j.code === '42501') throw new DbError('FORBIDDEN', 'Unauthorized action.');
+      throw new DbError('DB', msg);
+    }
+    if (res.status === 204) return null;
+    const txt = await res.text(); return txt ? JSON.parse(txt) : null;
+  },
+  async rpc(name, args) { return this.req('POST', '/rpc/' + name, args || {}); },
+  async list(t) {
+    let all = [], from = 0; const step = 1000;
+    for (;;) {
+      const rows = await this.req('GET', `/${t}?select=*&order=id.asc`, undefined, { Range: `${from}-${from + step - 1}`, 'Range-Unit': 'items' });
+      all = all.concat(rows || []); if (!rows || rows.length < step) break; from += step;
+    }
+    return all;
+  },
+  async insert(t, row) { const r = await this.req('POST', `/${t}`, row, { Prefer: 'return=representation' }); return r[0]; },
+  async insertMany(t, rows) { if (!rows.length) return []; return this.req('POST', `/${t}`, rows, { Prefer: 'return=representation' }); },
+  async update(t, id, patch) { const r = await this.req('PATCH', `/${t}?id=eq.${id}`, patch, { Prefer: 'return=representation' }); if (!r || !r.length) throw new DbError('FORBIDDEN', 'Unauthorized action.'); return r[0]; },
+  async remove(t, id) { await this.req('DELETE', `/${t}?id=eq.${id}`); },
+  async chk(p) { const r = await p; if (r && r.ok === false) throw new AppError(r.error || 'Request failed.'); return r; },
+  async register({ email, username, pin }) { await this.chk(this.rpc('app_register', { p_email: email, p_username: username, p_pin: pin })); },
+  async login(username, pin) {
+    const r = await this.chk(this.rpc('app_login', { p_username: username, p_pin: pin }));
+    this.token = r.token; sessionStorage.setItem(APP_CONFIG.SESSION_KEY, r.token); return r.user;
+  },
+  async restore() {
+    const tk = sessionStorage.getItem(APP_CONFIG.SESSION_KEY); if (!tk) return null; this.token = tk;
+    try { const r = await this.rpc('app_me'); if (r && r.ok && r.user) return r.user; } catch (e) { /* fallthrough */ }
+    this.token = null; sessionStorage.removeItem(APP_CONFIG.SESSION_KEY); return null;
+  },
+  async logout() { try { await this.rpc('app_logout'); } catch (e) { /* ignore */ } this.token = null; sessionStorage.removeItem(APP_CONFIG.SESSION_KEY); },
+  async forgot(email) { const r = await this.chk(this.rpc('app_forgot', { p_email: email })); return !!r.registered; },
+  async listUsers() { const r = await this.chk(this.rpc('admin_list_users')); return r.users || []; },
+  async setMenuAccess(id, arr) { await this.chk(this.rpc('admin_set_menu_access', { p_user_id: id, p_menu_access: arr })); },
+  async resetPin(id, pin) { await this.chk(this.rpc('admin_reset_pin', { p_user_id: id, p_pin: pin })); },
+  async setUserActive(id, active) { await this.chk(this.rpc('admin_set_user_active', { p_user_id: id, p_active: active })); },
+  async removeDemo() {
+    for (const t of ['ticket_comments', 'ticket_assignments', 'ticket_approvals', 'ticket_status_history', 'tickets', 'recurring_master', 'vendors', 'categories', 'employees'])
+      await this.req('DELETE', `/${t}?is_demo=eq.true`);
+  },
+  async resetDemo() { throw new AppError('Reset is available in demo mode only.'); },
+  async testConnection() {
+    try { await this.req('GET', '/priorities?select=id&limit=1'); return { ok: true, msg: 'Connection successful.' }; }
+    catch (e) { return { ok: false, msg: friendly(e) }; }
+  },
+  hasDemo() { return false }
+};
+let DB = LocalDB;
+
+/* ---------- Demo seed data (every row flagged is_demo so it can be removed in Settings) ---------- */
+async function seedLocal() {
+  // Clean install: only the required system defaults are created (Priority/Status/Currency levels
+  // and the workflow settings below). No sample employees, vendors, categories, tickets or demo
+  // logins are seeded. The very first person to complete "New Registration" automatically becomes
+  // the Admin Manager (see LocalDB.register), so the app is fully usable from a blank state.
+  const d = { t: {}, seq: {}, cnt: { ticket: 0, request: 0 } };
+  TABLES.forEach(t => { d.t[t] = []; d.seq[t] = 0; });
+  const add = (t, row, demo) => { row.id = ++d.seq[t]; if (demo) row.is_demo = true; if (!row.created_at) row.created_at = nowISO(); d.t[t].push(row); return row; };
+  [['Critical', 'C', 2], ['High', 'H', 4], ['Medium', 'M', 24], ['Low', 'L', 48]].forEach(([name, code, h]) => add('priorities', { name, code, deadline_hours: h }));
+  CORE_STATUSES.forEach(name => add('statuses', { name }));
+  ['INR', 'USD', 'EUR', 'GBP', 'AED'].forEach(name => add('currencies', { name }));
+  add('app_settings', { key: 'session_timeout', value: '30' }); add('app_settings', { key: 'rec_priority_id', value: '3' }); add('app_settings', { key: 'rec_currency_id', value: '1' });
+  return d;
+}
+
+/* ===================== STATE & LOOKUPS ===================== */
+let ME = null;                       // logged-in user {id, username, emp_id, role, name, ...}
+const S = {}, IDX = {};              // in-memory cache of table rows / id indexes
+TABLES.forEach(t => { S[t] = []; IDX[t] = new Map(); });
+const LAST = { comment: new Map(), assign: new Map() };
+const TICKET_TABLES = ['tickets', 'ticket_comments', 'ticket_assignments', 'ticket_approvals', 'ticket_status_history'];
+
+function reindex(t) {
+  IDX[t] = new Map(S[t].map(r => [r.id, r]));
+  if (t === 'ticket_comments') { LAST.comment = new Map(); S[t].forEach(c => LAST.comment.set(c.ticket_id, c)); }
+  if (t === 'ticket_assignments') { LAST.assign = new Map(); S[t].forEach(a => LAST.assign.set(a.ticket_id, a)); }
+}
+async function loadData(tables) {
+  tables = tables || DATA_TABLES;
+  const res = await Promise.all(tables.map(t => DB.list(t)));
+  tables.forEach((t, i) => { S[t] = res[i]; reindex(t); });
+}
+const emp = id => IDX.employees.get(id), vendor = id => IDX.vendors.get(id), cat = id => IDX.categories.get(id),
+  pri = id => IDX.priorities.get(id), cur = id => IDX.currencies.get(id);
+const empName = id => (emp(id) || {}).name || '';
+const byName = (table, name) => S[table].find(r => String(r.name).toLowerCase() === String(name || '').trim().toLowerCase());
+const setting = (k, def) => { const r = S.app_settings.find(x => x.key === k); return r ? r.value : def; };
+async function saveSetting(k, v) {
+  const r = S.app_settings.find(x => x.key === k);
+  if (r) await DB.update('app_settings', r.id, { value: String(v) }); else await DB.insert('app_settings', { key: k, value: String(v) });
+}
+const executives = () => S.employees.filter(e => e.user_type === ROLE.EXE).sort((a, b) => a.name.localeCompare(b.name));
+const approvers = () => S.employees.filter(e => e.user_type === ROLE.APR).sort((a, b) => a.name.localeCompare(b.name));
+const requestorName = t => t.source === 'Recurring' ? 'System' : empName(t.requested_by);
+
+/* ===================== MENU ACCESS (per-user, admin-manager assignable) =====================
+   Admin Manager always has full access. For every other role, the Admin Manager can choose,
+   per individual user, which of that role's menus (plus the optional Reports add-on) are enabled. */
+const MENU_CANDIDATES = {
+  [ROLE.REQ]: [{ k: 'request', label: 'Ticket Request' }, { k: 'reports', label: 'Reports' }],
+  [ROLE.EXE]: [{ k: 'executive', label: 'Admin Executive' }, { k: 'reports', label: 'Reports' }],
+  [ROLE.APR]: [{ k: 'approval', label: 'Approval' }, { k: 'reports', label: 'Reports' }]
+};
+function defaultMenuAccessFor(role) {
+  if (role === ROLE.REQ) return ['request'];
+  if (role === ROLE.EXE) return ['executive'];
+  if (role === ROLE.APR) return ['approval', 'reports'];
+  return [];
+}
+function effectiveAccess(u) { return u.role === ROLE.MGR ? null : (u.menu_access == null ? defaultMenuAccessFor(u.role) : u.menu_access); }
+function hasMenu(key) { if (!ME) return false; if (ME.role === ROLE.MGR) return true; return effectiveAccess(ME).includes(key); }
+
+/* ===================== AUDIT ===================== */
+const Audit = {
+  log(action, entity, ref, details) {
+    DB.insert('audit_log', { user_id: ME ? ME.id : null, username: ME ? ME.username : null, action, entity, entity_ref: ref == null ? '' : String(ref), details: String(details || '').slice(0, 500) }).catch(() => { });
+  }
+};
+
+/* ===================== WORKFLOW RULES ===================== */
+// Allowed status transitions by role. (Some "hidden" ones are used only by the approver-change action.)
+const TRANSITIONS = {
+  [ROLE.MGR]: {
+    'Draft': ['New', 'Pending Approval', 'Assigned', 'Rejected'], 'New': ['Pending Approval', 'Assigned', 'Rejected'],
+    'Approved': ['Assigned', 'Rejected', 'Pending Approval'], 'Assigned': ['In-Progress', 'Pending Approval'],
+    'In-Progress': ['Completed'], 'Completed': ['Closed']
+  },
+  [ROLE.APR]: { 'Pending Approval': ['Approved', 'Rejected'] },
+  [ROLE.EXE]: { 'Assigned': ['In-Progress'], 'In-Progress': ['Completed'] },
+  [ROLE.REQ]: {}
+};
+const isActiveStatus = s => !['Completed', 'Closed', 'Rejected'].includes(s);
+const approvalOK = t => !t.approval_required || t.approval_status === 'Approved';
+const canAssignNow = t => approvalOK(t) && ['Draft', 'New', 'Approved', 'Assigned'].includes(t.status);
+const approverEditable = t => !!t.approval_required && ['Draft', 'New', 'Pending Approval', 'Approved', 'Assigned'].includes(t.status);
+const canDeleteTicket = t => (ME.role === ROLE.MGR && ['Draft', 'New'].includes(t.status)) || (ME.role === ROLE.REQ && t.requested_by === ME.emp_id && t.status === 'Draft');
+function handlerLockReason(t) {
+  if (t.approval_required && t.approval_status === 'Pending') return 'Awaiting approver action';
+  if (t.approval_required && t.approval_status === 'Rejected') return 'Approval rejected';
+  if (t.approval_required && t.approval_status !== 'Approved') return 'Send for approval first';
+  if (!canAssignNow(t)) return 'Work already started or ticket closed';
+  return '';
+}
+function nextStatuses(role, t) {
+  const list = (TRANSITIONS[role] || {})[t.status] || [];
+  return list.filter(to => {
+    if (role === ROLE.MGR) {
+      if (to === 'Pending Approval') return ['Draft', 'New'].includes(t.status) && t.approval_required && !!t.approver_id && !['Pending', 'Approved'].includes(t.approval_status);
+      if (to === 'Assigned') return approvalOK(t) && !!t.handler_id && ['Draft', 'New', 'Approved'].includes(t.status);
+    }
+    return true;
+  });
+}
+function requireRole(...roles) { if (!ME || !roles.includes(ME.role)) throw new AppError('Unauthorized action.'); }
+
+// deadline / overdue
+function dueMs(t) { const p = pri(t.priority_id); return p ? new Date(t.created_at).getTime() + p.deadline_hours * 3600e3 : null; }
+function isOverdue(t) { const d = dueMs(t); return d != null && isActiveStatus(t.status) && Date.now() > d; }
+
+async function logStatus(t, to, comment) {
+  await DB.insert('ticket_status_history', { ticket_id: t.id, prev_status: t.status, new_status: to, changed_by: ME.id, changed_by_name: ME.name, changed_at: nowISO(), comments: comment || null });
+}
+async function addComment(t, text) {
+  text = String(text || '').trim(); if (!text) return;
+  await DB.insert('ticket_comments', { ticket_id: t.id, user_id: ME.id, author_name: ME.name, comment: text.slice(0, 500) });
+}
+
+async function createTicket(f, source) {
+  const now = new Date(), appr = !!f.approval_required;
+  const row = {
+    requested_by: f.requested_by || null, request_date: dstr(now), request_time: tstr(now), category_id: f.category_id || null, details: String(f.details).trim(),
+    vendor_id: f.vendor_id || null, currency_id: f.currency_id, cost: Number(f.cost), priority_id: f.priority_id, approval_required: appr,
+    approver_id: appr ? (f.approver_id || null) : null, approval_status: appr ? 'Not Sent' : 'NA', handler_id: null,
+    status: source === 'Request' ? 'Draft' : 'New', source, recurring_id: f.recurring_id || null, occurrence_date: f.occurrence_date || null, created_by: ME ? ME.id : null
+  };
+  const t = await DB.insert('tickets', row);
+  await DB.insert('ticket_status_history', { ticket_id: t.id, prev_status: null, new_status: row.status, changed_by: ME.id, changed_by_name: source === 'Recurring' ? 'System' : ME.name, changed_at: nowISO(), comments: source === 'Recurring' ? 'System-generated recurring ticket' : null });
+  Audit.log('Create', 'Ticket', t.ticket_no, `${source} ticket created`);
+  return t;
+}
+async function updateTicketFields(t, f) {
+  requireRole(ROLE.MGR, ROLE.REQ);
+  if (!['Draft', 'New'].includes(t.status)) throw new AppError('Ticket details can be edited only while the ticket is Draft or New.');
+  if (ME.role === ROLE.REQ && (t.requested_by !== ME.emp_id || t.status !== 'Draft')) throw new AppError('Unauthorized action.');
+  const patch = { category_id: f.category_id, details: String(f.details).trim(), vendor_id: f.vendor_id, currency_id: f.currency_id, cost: Number(f.cost), priority_id: f.priority_id, updated_by: ME.id };
+  if (ME.role === ROLE.MGR && f.requested_by) patch.requested_by = f.requested_by;
+  const appr = !!f.approval_required;
+  if (appr !== !!t.approval_required) { patch.approval_required = appr; patch.approval_status = appr ? 'Not Sent' : 'NA'; if (!appr) patch.approver_id = null; }
+  await DB.update('tickets', t.id, patch);
+  Audit.log('Edit', 'Ticket', t.ticket_no, 'Ticket details edited');
+}
+async function deleteTicket(t) {
+  if (!canDeleteTicket(t)) throw new AppError('Only Draft or New tickets can be deleted.');
+  await DB.remove('tickets', t.id); Audit.log('Delete', 'Ticket', t.ticket_no, 'Ticket deleted');
+}
+async function sendForApproval(t) {
+  requireRole(ROLE.MGR);
+  if (!t.approval_required) throw new AppError('Approval is not required for this ticket.');
+  if (!t.approver_id) throw new AppError('Select an approver before sending.');
+  if (!['Draft', 'New'].includes(t.status)) throw new AppError('This ticket cannot be sent for approval at its current status.');
+  await DB.update('tickets', t.id, { status: 'Pending Approval', approval_status: 'Pending', updated_by: ME.id });
+  await logStatus(t, 'Pending Approval', 'Sent to ' + empName(t.approver_id));
+  await DB.insert('ticket_approvals', { ticket_id: t.id, approver_id: t.approver_id, sent_by: ME.id, sent_at: nowISO(), decision: 'Pending', decided_at: null, comments: null });
+  Audit.log('ApprovalSent', 'Ticket', t.ticket_no, 'Sent to ' + empName(t.approver_id));
+}
+async function setApprover(t, approverId) {
+  requireRole(ROLE.MGR);
+  if (!approverEditable(t)) throw new AppError('The approver cannot be changed at this stage.');
+  const a = emp(approverId); if (!a || a.user_type !== ROLE.APR) throw new AppError('Select a valid approver.');
+  if (t.approver_id === approverId) return;
+  const old = empName(t.approver_id) || 'none';
+  if (['Approved', 'Assigned'].includes(t.status)) {               // decision already given -> fresh approval needed
+    await DB.update('tickets', t.id, { approver_id: approverId, approval_status: 'Pending', status: 'Pending Approval', handler_id: null, updated_by: ME.id });
+    await logStatus(t, 'Pending Approval', 'Approver changed to ' + a.name + ' - fresh approval required');
+    await DB.insert('ticket_approvals', { ticket_id: t.id, approver_id: approverId, sent_by: ME.id, sent_at: nowISO(), decision: 'Pending', decided_at: null, comments: null });
+  } else if (t.status === 'Pending Approval') {                    // re-route the pending request
+    await DB.update('tickets', t.id, { approver_id: approverId, updated_by: ME.id });
+    const pend = S.ticket_approvals.filter(x => x.ticket_id === t.id && x.decision === 'Pending').pop();
+    if (pend) await DB.update('ticket_approvals', pend.id, { approver_id: approverId });
+    else await DB.insert('ticket_approvals', { ticket_id: t.id, approver_id: approverId, sent_by: ME.id, sent_at: nowISO(), decision: 'Pending', decided_at: null, comments: null });
+  } else await DB.update('tickets', t.id, { approver_id: approverId, updated_by: ME.id });
+  await addComment(t, `Approver changed from ${old} to ${a.name}`);
+  Audit.log('ApproverChange', 'Ticket', t.ticket_no, `${old} -> ${a.name}`);
+}
+async function assignExec(t, execId) {
+  requireRole(ROLE.MGR);
+  if (!canAssignNow(t)) throw new AppError(t.approval_required && t.approval_status !== 'Approved' ? 'Approval required before assignment.' : 'This ticket cannot be assigned at its current status.');
+  const x = emp(execId); if (!x || x.user_type !== ROLE.EXE) throw new AppError('Select a valid Admin Executive.');
+  if (t.handler_id === execId) return;
+  const old = empName(t.handler_id), toAssigned = t.status !== 'Assigned', patch = { handler_id: execId, updated_by: ME.id };
+  if (toAssigned) patch.status = 'Assigned';
+  await DB.update('tickets', t.id, patch);
+  await DB.insert('ticket_assignments', { ticket_id: t.id, executive_id: execId, assigned_by: ME.id, assigned_at: nowISO() });
+  if (toAssigned) await logStatus(t, 'Assigned', 'Assigned to ' + x.name); else await addComment(t, `Reassigned from ${old} to ${x.name}`);
+  Audit.log('Assign', 'Ticket', t.ticket_no, 'Assigned to ' + x.name);
+}
+async function changeStatus(t, to, comment) {
+  const role = ME.role;
+  if (role === ROLE.EXE && t.handler_id !== ME.emp_id) throw new AppError('Unauthorized action.');
+  if (role === ROLE.APR && t.approver_id !== ME.emp_id) throw new AppError('Unauthorized action.');
+  if (!nextStatuses(role, t).includes(to)) throw new AppError('This status change is not allowed.');
+  if (to === 'Pending Approval') return sendForApproval(t);
+  if (to === 'Rejected' && role === ROLE.MGR && !String(comment || '').trim()) throw new AppError('Enter a reason for rejection.');
+  const patch = { status: to, updated_by: ME.id }; if (to === 'Closed') patch.closed_at = nowISO();
+  if (role === ROLE.APR) patch.approval_status = to;
+  await DB.update('tickets', t.id, patch);
+  await logStatus(t, to, comment); await addComment(t, comment);
+  Audit.log(to === 'Closed' ? 'Close' : (to === 'Approved' ? 'Approve' : (to === 'Rejected' ? 'Reject' : 'StatusChange')), 'Ticket', t.ticket_no, `${t.status} -> ${to}`);
+}
+async function decideApproval(t, decision, comment) {
+  requireRole(ROLE.APR);
+  if (t.approver_id !== ME.emp_id || t.status !== 'Pending Approval') throw new AppError('This ticket is not pending your approval.');
+  if (decision === 'Rejected' && !String(comment || '').trim()) throw new AppError('Enter a comment for rejection.');
+  await changeStatus(t, decision, comment);
+  const pend = S.ticket_approvals.filter(x => x.ticket_id === t.id && x.decision === 'Pending').pop();
+  if (pend) await DB.update('ticket_approvals', pend.id, { decision, decided_at: nowISO(), comments: comment || null });
+}
+
+/* ===================== RECURRING ENGINE =====================
+   Due Date is the first due date; the cost repeats monthly on the same day until End Date.
+   Only the latest due occurrence (<= today) is generated, once (no duplicates, no back-fill). */
+async function runRecurring() {
+  if (!ME || ME.role !== ROLE.MGR) return 0;
+  await loadData(['recurring_master', 'tickets', 'vendors', 'priorities', 'currencies', 'app_settings', 'categories']);
+  const today = todayStr(); let made = 0;
+  for (const r of S.recurring_master) {
+    if (!r.due_date || today < r.due_date) continue;
+    const dd = parseD(r.due_date), td = parseD(today);
+    let k = (td.getFullYear() - dd.getFullYear()) * 12 + (td.getMonth() - dd.getMonth());
+    let occ = addMonthsClamp(r.due_date, k); if (occ > today) { k--; occ = addMonthsClamp(r.due_date, k); }
+    if (k < 0) continue;
+    if (r.end_date && occ > r.end_date) continue;
+    if (S.tickets.some(t => t.recurring_id === r.id && t.occurrence_date === occ)) continue;
+    const v = vendor(r.vendor_id);
+    const priId = +setting('rec_priority_id', 0) || (byName('priorities', 'Medium') || S.priorities[0] || {}).id;
+    const curId = +setting('rec_currency_id', 0) || (S.currencies[0] || {}).id;
+    try {
+      await createTicket({
+        requested_by: null, category_id: v ? v.category_id : null, details: `Recurring: ${r.cost_name} - ${r.location || ''} (due ${fmtD(occ, true)})`.slice(0, 250),
+        vendor_id: r.vendor_id, currency_id: curId, cost: r.amount, priority_id: priId, approval_required: false, recurring_id: r.id, occurrence_date: occ
+      }, 'Recurring');
+      made++;
+    } catch (e) { if (!(e instanceof DbError && e.code === 'DUP')) console.error(e); }
+  }
+  if (made) await loadData(TICKET_TABLES);
+  return made;
+}
+
+/* ===================== UI FRAMEWORK: toast, modal, forms ===================== */
+function toast(msg, type = 'success') {
+  const el = document.createElement('div'); el.className = 'toast ' + type; el.setAttribute('role', type === 'error' ? 'alert' : 'status');
+  const ic = { success: 'fa-circle-check', error: 'fa-circle-exclamation', info: 'fa-circle-info' }[type] || 'fa-circle-info';
+  el.innerHTML = `<i class="fa-solid ${ic}"></i><div>${esc(msg)}</div>`;
+  $('#toasts').appendChild(el); setTimeout(() => el.remove(), type === 'error' ? 6000 : 3500);
+}
+const Modal = {
+  // Modals NEVER close when the backdrop is clicked. They close only through their own buttons
+  // (or Esc for read-only viewers created with escClose:true).
+  open(o) {
+    const ov = document.createElement('div'); ov.className = 'modal-ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
+    ov.innerHTML = `<div class="modal ${o.size || ''}"><div class="m-head"><h3>${esc(o.title)}</h3></div><div class="m-body">${o.html || ''}</div><div class="m-foot"></div></div>`;
+    const ctx = { el: ov, body: $('.m-body', ov), $: s => $(s, ov), close() { document.removeEventListener('keydown', onKey); ov.remove(); if (!$('.modal-ov')) document.body.classList.remove('modal-open'); } };
+    const onKey = e => { if (e.key === 'Escape' && o.escClose) { const all = $$('.modal-ov'); if (all[all.length - 1] === ov) ctx.close(); } };
+    if (o.escClose) document.addEventListener('keydown', onKey);
+    (o.buttons || []).forEach(b => {
+      const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'btn ' + (b.cls || '');
+      btn.innerHTML = (b.icon ? `<i class="fa-solid ${b.icon}"></i>` : '') + esc(b.label);
+      btn.onclick = async () => {
+        btn.disabled = true;
+        try { const r = b.onClick ? await b.onClick(ctx) : undefined; if (r !== false) ctx.close(); }
+        catch (e) { toast(friendly(e), 'error'); } finally { btn.disabled = false; }
+      };
+      $('.m-foot', ov).appendChild(btn);
+    });
+    document.body.appendChild(ov); document.body.classList.add('modal-open');
+    if (o.onMount) o.onMount(ctx);
+    if (!o.noFocus) { const f = $('input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled])', ctx.body); if (f) f.focus(); }
+    return ctx;
+  }
+};
+function confirmDlg({ title = 'Please confirm', message, confirmLabel = 'Confirm', danger = false }) {
+  return new Promise(res => Modal.open({
+    title, size: 'sm', html: `<p style="margin:0">${message}</p>`, noFocus: true,
+    buttons: [{ label: 'Cancel', onClick: () => { res(false); } }, { label: confirmLabel, cls: danger ? 'danger' : 'primary', onClick: () => { res(true); } }]
+  }));
+}
+function promptText({ title, label, required = true, confirmLabel = 'Save', danger = false, intro = '' }) {
+  return new Promise(res => Modal.open({
+    title, size: 'sm', html: `${intro ? `<p style="margin-top:0">${intro}</p>` : ''}<div class="field"><label>${esc(label)}${required ? ' <span class="req">*</span>' : ''}</label><textarea class="txt" name="txt" maxlength="250"></textarea><div class="err" data-e="txt"></div></div>`,
+    buttons: [{ label: 'Cancel', onClick: () => { res(null); } }, {
+      label: confirmLabel, cls: danger ? 'danger' : 'primary', onClick: ctx => {
+        const v = $('[name=txt]', ctx.el).value.trim();
+        if (required && !v) { showErrs(ctx.el, { txt: `${label} is required.` }); return false; }
+        res(v);
+      }
+    }]
+  }));
+}
+const fld = (label, inner, o = {}) => `<div class="field"><label>${esc(label)}${o.req ? ' <span class="req">*</span>' : ''}</label>${inner}${o.hint ? `<div class="hint">${esc(o.hint)}</div>` : ''}<div class="err" data-e="${o.k || ''}"></div></div>`;
+const optHtml = (opts, sel, ph) => (ph != null ? `<option value="">${esc(ph)}</option>` : '') + opts.map(o => `<option value="${esc(o.v)}"${String(o.v) === String(sel) ? ' selected' : ''}>${esc(o.t)}</option>`).join('');
+function showErrs(root, errs) {
+  $$('.err', root).forEach(e => { e.textContent = ''; }); $$('.invalid', root).forEach(e => e.classList.remove('invalid'));
+  let first = null;
+  Object.keys(errs).forEach(k => { const e = $(`[data-e="${k}"]`, root); if (e) e.textContent = errs[k]; const i = $(`[name="${k}"]`, root); if (i) { i.classList.add('invalid'); first = first || i; } });
+  if (first) first.focus(); return !Object.keys(errs).length;
+}
+const val = (root, k) => { const i = $(`[name="${k}"]`, root); return i ? String(i.value).trim() : ''; };
+const ib = (act, id, icon, tip, o = {}) => `<button class="ib ${o.cls || ''}" data-act="${act}" data-id="${id}" title="${esc(o.dis ? (o.disTip || tip) : tip)}" aria-label="${esc(tip)}" ${o.dis ? 'disabled' : ''}><i class="fa-solid ${icon}"></i><span class="ib-t">${esc(o.txt || tip)}</span></button>`;
+
+/* ===================== BADGES ===================== */
+const priBadge = t => { const p = pri(t.priority_id); return p ? `<span class="pr pr-${esc(p.code)}" title="${esc(p.name)} - deadline ${p.deadline_hours} hours">${esc(p.code)}</span>` : ''; };
+const priRank = t => { const p = pri(t.priority_id); return p ? p.id : 99; };
+function apBadge(t) {
+  if (!t.approval_required) return '<span class="mut" title="Approval not required">N/A</span>';
+  const m = { Approved: 'A', Rejected: 'R', Pending: 'P' }[t.approval_status];
+  return m ? `<span class="ap ap-${m}" title="${t.approval_status}">${m}</span>` : '<span class="mut" title="Approval required - not yet sent">&ndash;</span>';
+}
+const stBadge = s => `<span class="st st-${String(s).replace(/[^A-Za-z]/g, '')}">${esc(s)}</span>`;
+const costCell = t => `<span class="cur">${esc((cur(t.currency_id) || {}).name || '')}</span>${money(t.cost)}`;
+const ticketCmp = (a, b) => (priRank(a) - priRank(b)) || (new Date(b.created_at) - new Date(a.created_at)) || (b.id - a.id);
+function updateOverdue() { $$('tr[data-due]').forEach(tr => tr.classList.toggle('overdue', Date.now() > +tr.dataset.due)); }
+const dueAttr = t => { const d = dueMs(t); return (d != null && isActiveStatus(t.status)) ? ` data-due="${d}" ${Date.now() > d ? 'class="overdue"' : ''}` : ''; };
+
+/* ===================== DATA GRID ===================== */
+class DataGrid {
+  constructor(cfg) { this.cfg = cfg; this.q = ''; this.f = {}; this.sk = null; this.sd = 1; this.page = 1; this.ps = cfg.pageSize || APP_CONFIG.PAGE_SIZE; this.loading = false; this.error = ''; }
+  mount(host) {
+    this.host = host; const c = this.cfg;
+    host.innerHTML = `<div class="gtool"><div class="srch"><i class="fa-solid fa-magnifying-glass"></i><input class="inp" type="search" placeholder="${esc(c.searchPh || 'Search...')}" aria-label="Search"></div>
+      ${(c.filters || []).map(f => `<select class="sel" data-f="${f.k}" aria-label="${esc(f.label)}"><option value="">${esc(f.label)}: All</option>${f.opts().map(o => `<option value="${esc(o.v)}">${esc(o.t)}</option>`).join('')}</select>`).join('')}
+      <button class="btn sm" data-g="reset" title="Clear search, filters and sorting"><i class="fa-solid fa-filter-circle-xmark"></i>Clear</button>
+      <div class="gr">${c.right || ''}</div></div><div class="tbl-wrap"></div><div class="pager"></div>`;
+    $('.srch input', host).addEventListener('input', debounce(e => { this.q = e.target.value; this.page = 1; this.draw(); }, 150));
+    $$('select[data-f]', host).forEach(s => s.addEventListener('change', () => { this.f[s.dataset.f] = s.value; this.page = 1; this.draw(); }));
+    host.addEventListener('click', e => {
+      const g = e.target.closest('[data-g]'); if (g && g.dataset.g === 'reset') { this.q = ''; this.f = {}; this.sk = null; this.page = 1; $('.srch input', host).value = ''; $$('select[data-f]', host).forEach(s => { s.value = ''; }); this.draw(); return; }
+      const th = e.target.closest('th[data-k]'); if (th) { const k = th.dataset.k; if (this.sk === k) { if (this.sd === 1) this.sd = -1; else { this.sk = null; this.sd = 1; } } else { this.sk = k; this.sd = 1; } this.draw(); return; }
+      const p = e.target.closest('[data-p]'); if (p && !p.disabled) { this.page = +p.dataset.p; this.draw(); return; }
+      const tool = e.target.closest('[data-tool]'); if (tool && c.onTool && !tool.disabled) { c.onTool(tool.dataset.tool, tool, e); return; }
+      const act = e.target.closest('[data-act]'); if (act && c.onAct && !act.disabled) { c.onAct(act.dataset.act, +act.dataset.id, act, e); }
+    });
+    host.addEventListener('change', e => { const s = e.target.closest('[data-chg]'); if (s && c.onChange) c.onChange(s.dataset.chg, +s.dataset.id, s); if (e.target.matches('.pager select')) { this.ps = +e.target.value; this.page = 1; this.draw(); } });
+    this.draw();
+  }
+  rows() {
+    const c = this.cfg; let r = c.getRows(); const q = this.q.toLowerCase();
+    if (q) r = r.filter(x => c.searchText(x).toLowerCase().includes(q));
+    (c.filters || []).forEach(f => { const v = this.f[f.k]; if (v) r = r.filter(x => f.test(x, v)); });
+    r = r.slice(); const col = c.columns.find(x => x.k === this.sk);
+    if (col && col.sort) { const d = this.sd; r.sort((a, b) => { const A = col.sort(a), B = col.sort(b); return (A < B ? -1 : A > B ? 1 : 0) * d; }); }
+    else if (c.defaultCmp) r.sort(c.defaultCmp);
+    return r;
+  }
+  setLoading(b) { this.loading = b; if (this.host) this.draw(); }
+  setError(m) { this.error = m; if (this.host) this.draw(); }
+  draw() {
+    const c = this.cfg, wrap = $('.tbl-wrap', this.host), st = wrap.scrollTop, sl = wrap.scrollLeft;
+    if (this.loading) { wrap.innerHTML = '<div class="loading"><span class="spin"></span><div>Loading...</div></div>'; $('.pager', this.host).innerHTML = ''; return; }
+    if (this.error) { wrap.innerHTML = `<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i>${esc(this.error)}</div>`; $('.pager', this.host).innerHTML = ''; return; }
+    const all = this.rows(), total = all.length, pages = Math.max(1, Math.ceil(total / this.ps)); if (this.page > pages) this.page = pages;
+    const from = (this.page - 1) * this.ps, slice = all.slice(from, from + this.ps);
+    if (!total) {
+      wrap.innerHTML = `<div class="empty"><i class="fa-regular fa-folder-open"></i>${esc(c.emptyMsg || 'No records found.')}</div>`;
+    } else {
+      wrap.innerHTML = `<table class="tbl"><colgroup>${c.columns.map(x => `<col style="width:${x.w}%">`).join('')}</colgroup>
+        <thead><tr>${c.columns.map(x => `<th class="${x.cls || ''} ${x.sort ? 'sortable' : ''}" ${x.sort ? `data-k="${x.k}"` : ''} title="${esc(x.tip || x.label)}">${esc(x.label)}${this.sk === x.k ? `<span class="sa">${this.sd === 1 ? '&#9650;' : '&#9660;'}</span>` : ''}</th>`).join('')}</tr></thead>
+        <tbody>${slice.map(r => `<tr data-id="${r.id}"${c.rowAttrs ? c.rowAttrs(r) : ''}>${c.columns.map(x => `<td class="${x.cls || ''}"${x.title ? ` title="${esc(x.title(r))}"` : ''}>${x.cell ? x.cell(r) : esc(r[x.k] ?? '')}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+      wrap.scrollTop = st; wrap.scrollLeft = sl;
+    }
+    let pg = ''; const a = Math.max(1, this.page - 2), b = Math.min(pages, a + 4);
+    for (let i = a; i <= b; i++) pg += `<button class="pg ${i === this.page ? 'on' : ''}" data-p="${i}">${i}</button>`;
+    $('.pager', this.host).innerHTML = `<span>${total ? `Showing ${from + 1}-${Math.min(total, from + this.ps)} of ${total}` : '0 records'}</span><span class="sp"></span>
+      <label>Rows <select class="sel">${[10, 15, 25, 50, 100].map(n => `<option ${n === this.ps ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+      <button class="pg" data-p="${this.page - 1}" ${this.page <= 1 ? 'disabled' : ''} aria-label="Previous page">&lsaquo;</button>${pg}<button class="pg" data-p="${this.page + 1}" ${this.page >= pages ? 'disabled' : ''} aria-label="Next page">&rsaquo;</button>`;
+    updateOverdue();
+  }
+}
+
+/* ===================== IMPORT / EXPORT ===================== */
+const Exp = {
+  cell(v) { if (v == null) return ''; if (typeof v === 'number') return v; let s = String(v); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; return s; }, // blocks spreadsheet formula injection
+  csv(name, headers, rows) {
+    const q = v => { const s = String(this.cell(v)); return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+    download(name + '.csv', '\uFEFF' + [headers.map(q).join(',')].concat(rows.map(r => r.map(q).join(','))).join('\r\n'), 'text/csv;charset=utf-8');
+  },
+  xlsx(name, headers, rows) {
+    if (!window.XLSX) throw new AppError('Excel export needs the SheetJS library (internet connection). Use CSV instead.');
+    const ws = XLSX.utils.aoa_to_sheet([headers].concat(rows.map(r => r.map(v => this.cell(v)))));
+    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Data'); XLSX.writeFile(wb, name + '.xlsx');
+  }
+};
+const exportBtn = () => `<div class="menu-wrap"><button class="btn sm" data-tool="export-menu" title="Export the filtered list"><i class="fa-solid fa-file-export"></i>Export</button><div class="menu hidden"><button data-tool="export-csv"><i class="fa-solid fa-file-csv"></i>CSV</button><button data-tool="export-xlsx"><i class="fa-solid fa-file-excel"></i>Excel</button></div></div>`;
+function toggleExportMenu(btn) { const m = btn.parentElement.querySelector('.menu'); const open = m.classList.contains('hidden'); $$('.menu').forEach(x => x.classList.add('hidden')); if (open) m.classList.remove('hidden'); }
+function doExport(kind, name, headers, rows, entity) {
+  try {
+    if (!rows.length) { toast('Nothing to export.', 'info'); return; }
+    const fn = `${name}_${todayStr()}`; kind === 'xlsx' ? Exp.xlsx(fn, headers, rows) : Exp.csv(fn, headers, rows);
+    toast(`Exported ${rows.length} record(s).`); Audit.log('Export', entity, name, `${rows.length} rows (${kind})`);
+  } catch (e) { toast(e instanceof AppError ? e.message : 'Export failed. Please try again.', 'error'); }
+}
+function downloadTemplate(name, headers, sample) { Exp.csv(name + '_template', headers, sample ? [sample] : []); toast('Sample template downloaded.'); }
+
+const Importer = {
+  norm: s => String(s == null ? '' : s).toLowerCase().replace(/\(.*?\)/g, '').replace(/[^a-z0-9]/g, ''),
+  pick() { return new Promise(res => { const i = document.createElement('input'); i.type = 'file'; i.accept = '.csv,.xlsx,.xls'; i.onchange = () => res(i.files[0] || null); i.click(); }); },
+  parseCSV(text) {
+    text = text.replace(/^\uFEFF/, ''); const first = text.split(/\r?\n/)[0];
+    const delim = [',', ';', '\t'].sort((a, b) => first.split(b).length - first.split(a).length)[0];
+    const rows = []; let row = [], cell = '', q = false;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (q) { if (ch === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; } else cell += ch; }
+      else if (ch === '"') q = true;
+      else if (ch === delim) { row.push(cell); cell = ''; }
+      else if (ch === '\n' || ch === '\r') { if (ch === '\r' && text[i + 1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+      else cell += ch;
+    }
+    if (cell !== '' || row.length) { row.push(cell); rows.push(row); } return rows;
+  },
+  async read(file) {
+    if (file.size > 2 * 1024 * 1024) throw new AppError('File is too large (maximum 2 MB).');
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (ext === 'csv' || ext === 'txt') return this.parseCSV(await file.text());
+    if (ext === 'xlsx' || ext === 'xls') {
+      if (!window.XLSX) throw new AppError('Excel import needs the SheetJS library (internet connection). Save the file as CSV and import again.');
+      const wb = XLSX.read(await file.arrayBuffer(), { type: 'array', cellDates: true });
+      return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: true, defval: '', blankrows: false });
+    }
+    throw new AppError('Unsupported file type. Please use a .csv or .xlsx file.');
+  },
+  /* cfg: {entity, title, columns:[{key,label,req,parse(str)->{v}|{err}}], check(rec)->err, dupKey(rec), existing()->Set,
+           insertOne(rec)->Promise, bulk(recs)->Promise (optional), done()->Promise} */
+  async run(cfg) {
+    try {
+      const file = await this.pick(); if (!file) return;
+      const grid = await this.read(file);
+      if (grid.length < 2) throw new AppError('The file has no data rows.');
+      const heads = grid[0].map(this.norm), idx = {}, missing = [];
+      cfg.columns.forEach(c => { idx[c.key] = heads.indexOf(this.norm(c.label)); if (idx[c.key] < 0) idx[c.key] = heads.indexOf(this.norm(c.key)); if (idx[c.key] < 0 && c.req) missing.push(c.label); });
+      if (missing.length) throw new AppError('Missing required column(s): ' + missing.join(', ') + '. Download the sample template for the correct headings.');
+      const data = grid.slice(1).filter(r => r.some(c => String(c).trim() !== ''));
+      if (!data.length) throw new AppError('The file has no data rows.');
+      if (data.length > 2000) throw new AppError('Too many rows. Import up to 2000 rows at a time.');
+      const existing = cfg.existing ? cfg.existing() : new Set(), seen = new Set();
+      const res = data.map((r, i) => {
+        const rec = {}, errs = [];
+        cfg.columns.forEach(c => {
+          let raw = idx[c.key] >= 0 ? r[idx[c.key]] : ''; const s = raw instanceof Date ? dstr(raw) : String(raw == null ? '' : raw).replace(/[\u0000-\u001f]/g, ' ').trim();
+          if (!s) { if (c.req) errs.push(`${c.label} is required`); rec[c.key] = null; return; }
+          const p = c.parse ? c.parse(s) : { v: s }; if (p.err) errs.push(`${c.label}: ${p.err}`); else rec[c.key] = p.v;
+        });
+        if (!errs.length && cfg.check) { const e = cfg.check(rec); if (e) errs.push(e); }
+        let st = errs.length ? 'bad' : 'ok';
+        if (st === 'ok' && cfg.dupKey) { const k = cfg.dupKey(rec); if (k) { if (existing.has(k) || seen.has(k)) { st = 'dup'; errs.push('Duplicate record - skipped'); } else seen.add(k); } }
+        return { n: i + 2, rec, errs, st, cells: cfg.columns.slice(0, 4).map(c => String(r[idx[c.key]] ?? '')) };
+      });
+      const ok = res.filter(x => x.st === 'ok'), bad = res.filter(x => x.st === 'bad'), dup = res.filter(x => x.st === 'dup');
+      const sum = (a, b, c, d) => `<div class="imp-sum"><div>Total rows<b>${a}</b></div><div>Successful<b>${b}</b></div><div>Failed<b>${c}</b></div><div>Duplicate<b>${d}</b></div></div>`;
+      const icon = { ok: '<i class="fa-solid fa-circle-check rw-ok"></i> Valid', bad: '<i class="fa-solid fa-circle-xmark rw-bad"></i> Error', dup: '<i class="fa-solid fa-clone rw-dup"></i> Duplicate' };
+      Modal.open({
+        title: 'Import preview - ' + cfg.title, size: 'lg',
+        html: `<p style="margin-top:0" class="mut">File: ${esc(file.name)}. Only valid rows will be imported; rows with errors and duplicates are skipped.</p>${sum(res.length, ok.length, bad.length, dup.length)}
+          <div class="imp-tbl-wrap"><table class="mini"><thead><tr><th>Row</th><th>Result</th>${cfg.columns.slice(0, 4).map(c => `<th>${esc(c.label)}</th>`).join('')}<th>Message</th></tr></thead>
+          <tbody>${res.slice(0, 300).map(x => `<tr><td>${x.n}</td><td>${icon[x.st]}</td>${x.cells.map(v => `<td>${esc(v)}</td>`).join('')}<td>${esc(x.errs.join('; '))}</td></tr>`).join('')}</tbody></table></div>${res.length > 300 ? '<p class="hint">Showing the first 300 rows.</p>' : ''}`,
+        buttons: [{ label: 'Cancel' }, {
+          label: `Import ${ok.length} valid row(s)`, cls: 'primary', icon: 'fa-file-import', onClick: async () => {
+            if (!ok.length) { toast('There are no valid rows to import.', 'error'); return false; }
+            let done = 0; const failed = [];
+            let bulkOk = false;
+            if (cfg.bulk) { try { await cfg.bulk(ok.map(x => x.rec)); done = ok.length; bulkOk = true; } catch (e) { bulkOk = false; } }
+            if (!bulkOk) for (const x of ok) { try { await cfg.insertOne(x.rec); done++; } catch (e) { failed.push({ n: x.n, m: friendly(e) }); } }
+            if (cfg.done) await cfg.done();
+            Audit.log('Import', cfg.entity, file.name, `${done} imported, ${bad.length + failed.length} failed, ${dup.length} duplicates`);
+            Modal.open({
+              title: 'Import summary', size: 'sm', escClose: true, buttons: [{ label: 'Close', cls: 'primary' }],
+              html: `${sum(res.length, done, bad.length + failed.length, dup.length)}${failed.length ? `<p class="hint">Database errors: ${failed.map(f => `row ${f.n} (${esc(f.m)})`).join(', ')}</p>` : ''}`
+            });
+            toast(`Import finished: ${done} of ${res.length} row(s) imported.`, done ? 'success' : 'error');
+          }
+        }]
+      });
+    } catch (e) { toast(friendly(e), 'error'); }
+  }
+};
+
+/* ===================== AUTHENTICATION ===================== */
+function renderLogin() {
+  $('#shell').classList.add('hidden'); document.body.classList.remove('sb-open');
+  const demo = DB.mode === 'demo';
+  $('#login').innerHTML = `<div class="lg-card">
+    <div class="lg-brand"><div><h1><i class="fa-solid fa-boxes-packing"></i> ADMIN<br>PROCUREMENT &amp; TRACKING</h1><p>One system for admin purchase requests, approvals, execution and tracking.</p></div>
+      <ul><li><i class="fa-solid fa-check"></i> Centralized ticket &amp; request management</li><li><i class="fa-solid fa-check"></i> Role-based approval workflow</li><li><i class="fa-solid fa-check"></i> Live tracking &amp; closure history</li><li><i class="fa-solid fa-check"></i> Recurring admin cost automation</li></ul>
+      <div class="mut" style="font-size:11px">${demo ? 'Running in local demo mode' : 'Connected to cloud database'}</div></div>
+    <div class="lg-form"><div id="lgSlot"></div></div></div>`;
+  $('#login').classList.remove('hidden'); showLoginPane();
+}
+function showLoginPane() {
+  const slot = $('#lgSlot'); const demo = DB.mode === 'demo';
+  slot.innerHTML = `<h2>Sign in</h2><div class="sub">Enter your username and 4-digit PIN.</div><div id="lgMsg"></div>
+    <form id="frmLogin" novalidate>
+      ${fld('Username', `<input class="inp" name="username" autocomplete="username" required>`, { req: true, k: 'username' })}
+      ${fld('4-digit PIN', `<input class="inp" name="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="current-password" required>`, { req: true, k: 'pin' })}
+      <button class="btn primary" type="submit" style="width:100%;height:38px;justify-content:center" id="btnLogin"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+    </form>
+    <div class="lg-links"><a id="lnkForgot">Forgot Username / PIN?</a><a id="lnkReg">New Registration</a></div>
+    ${demo ? `<div class="demo-box"><b>Getting started</b><br>No accounts exist yet. Click <b>New Registration</b> below and register with any email/username/PIN — the very first person to register automatically becomes the <b>Admin Manager</b>. After that, every other person must already be listed in the Employee Master (added by the Admin Manager) before they can register.</div>` : ''}`;
+  $('#pin', slot); // no-op guard
+  const pinInp = $('[name=pin]', slot); pinInp.addEventListener('input', () => { pinInp.value = pinInp.value.replace(/\D/g, '').slice(0, 4); });
+  $('#lnkForgot').onclick = showForgotPane; $('#lnkReg').onclick = showRegisterPane;
+  $('#frmLogin').addEventListener('submit', async e => {
+    e.preventDefault(); const f = e.target, errs = {};
+    if (!val(f, 'username')) errs.username = 'Username is required.';
+    if (!V.pin(val(f, 'pin'))) errs.pin = 'PIN must be exactly 4 digits.';
+    if (!showErrs(f, errs)) return;
+    const btn = $('#btnLogin'); btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Signing in...';
+    try {
+      ME = await DB.login(val(f, 'username'), val(f, 'pin'));
+      Audit.log('Login', 'User', ME.username, 'Login successful');
+      await boot();
+    } catch (e2) { $('#lgMsg').innerHTML = `<div class="bad-msg"><i class="fa-solid fa-triangle-exclamation"></i> ${esc(friendly(e2))}</div>`; }
+    finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Login'; }
+  });
+}
+function showForgotPane() {
+  $('#lgSlot').innerHTML = `<h2>Forgot Username / PIN</h2><div class="sub">Enter your registered email address. The Admin Manager will assist you in resetting access.</div><div id="lgMsg"></div>
+    <form id="frmForgot" novalidate>${fld('Registered email address', `<input class="inp" name="email" type="email" required>`, { req: true, k: 'email' })}
+      <button class="btn primary" type="submit" style="width:100%;height:38px;justify-content:center"><i class="fa-solid fa-paper-plane"></i> Submit request</button></form>
+    <div class="lg-links"><a id="lnkBack">Back to login</a><span></span></div>`;
+  $('#lnkBack').onclick = showLoginPane;
+  $('#frmForgot').addEventListener('submit', async e => {
+    e.preventDefault(); const f = e.target;
+    if (!showErrs(f, V.email(val(f, 'email')) ? {} : { email: 'Enter a valid email address.' })) return;
+    try {
+      const ok = await DB.forgot(val(f, 'email'));
+      $('#lgMsg').innerHTML = ok
+        ? `<div class="ok-msg"><i class="fa-solid fa-circle-check"></i> Request submitted. The Admin Manager will reset your PIN and contact you.</div>`
+        : `<div class="bad-msg"><i class="fa-solid fa-triangle-exclamation"></i> Share the Registered Email Address to enable</div>`;
+    } catch (e2) { toast(friendly(e2), 'error'); }
+  });
+}
+function showRegisterPane() {
+  $('#lgSlot').innerHTML = `<h2>New Registration</h2><div class="sub">Your email must already exist in the Employee master. Contact the Admin Manager if you are not listed.</div><div id="lgMsg"></div>
+    <form id="frmReg" novalidate>${fld('Email address', `<input class="inp" name="email" type="email" required>`, { req: true, k: 'email' })}
+      ${fld('Username', `<input class="inp" name="username" required>`, { req: true, k: 'username', hint: '3-20 characters: letters, numbers, dot or underscore.' })}
+      ${fld('4-digit PIN', `<input class="inp" name="pin" type="password" inputmode="numeric" maxlength="4" required>`, { req: true, k: 'pin' })}
+      ${fld('Confirm PIN', `<input class="inp" name="pin2" type="password" inputmode="numeric" maxlength="4" required>`, { req: true, k: 'pin2' })}
+      <button class="btn primary" type="submit" style="width:100%;height:38px;justify-content:center"><i class="fa-solid fa-user-plus"></i> Register</button></form>
+    <div class="lg-links"><a id="lnkBack">Back to login</a><span></span></div>`;
+  $('#lnkBack').onclick = showLoginPane;
+  $$('[name=pin],[name=pin2]', $('#frmReg')).forEach(i => i.addEventListener('input', () => { i.value = i.value.replace(/\D/g, '').slice(0, 4); }));
+  $('#frmReg').addEventListener('submit', async e => {
+    e.preventDefault(); const f = e.target, errs = {};
+    if (!V.email(val(f, 'email'))) errs.email = 'Enter a valid email address.';
+    if (!V.username(val(f, 'username'))) errs.username = '3-20 characters: letters, numbers, dot or underscore only.';
+    if (!V.pin(val(f, 'pin'))) errs.pin = 'PIN must be exactly 4 numeric digits.';
+    else if (val(f, 'pin') !== val(f, 'pin2')) errs.pin2 = 'PINs do not match.';
+    if (!showErrs(f, errs)) return;
+    try {
+      await DB.register({ email: val(f, 'email'), username: val(f, 'username'), pin: val(f, 'pin') });
+      Audit.log('Register', 'User', val(f, 'username'), 'New registration');
+      $('#lgMsg').innerHTML = `<div class="ok-msg"><i class="fa-solid fa-circle-check"></i> Registration successful. Please sign in.</div>`;
+      showLoginPane(); $('#lgMsg').innerHTML = `<div class="ok-msg"><i class="fa-solid fa-circle-check"></i> Registration successful. Please sign in.</div>`;
+    } catch (e2) { showErrs(f, {}); $('#lgMsg').innerHTML = `<div class="bad-msg"><i class="fa-solid fa-triangle-exclamation"></i> ${esc(friendly(e2))}</div>`; }
+  });
+}
+async function doLogout() { Audit.log('Logout', 'User', ME ? ME.username : '', 'Logout'); await DB.logout(); ME = null; stopClocks(); renderLogin(); }
+
+/* ===================== BOOT ===================== */
+async function boot() {
+  await loadData();
+  try { const made = await runRecurring(); if (made) toast(`${made} recurring ticket(s) generated.`, 'info'); } catch (e) { console.error(e); }
+  $('#login').classList.add('hidden'); $('#shell').classList.remove('hidden');
+  $('#uAvatar').textContent = (ME.name || ME.username || '?').trim()[0].toUpperCase();
+  $('#uName').textContent = ME.name || ME.username; $('#uRole').textContent = ME.role;
+  buildNav(); go(homeRouteFor(ME.role));
+  startClocks();
+}
+async function tryRestore() {
+  await LocalDB.init(); DB = connMode() === 'cloud' ? CloudDB : LocalDB;
+  renderLogin();
+  try { const u = await DB.restore(); if (u) { ME = u; await boot(); } } catch (e) { /* ignore */ }
+}
+
+/* ===================== NAVIGATION ===================== */
+const MENU = [
+  { k: 'home', label: 'Home', icon: 'fa-house', roles: [ROLE.MGR, ROLE.EXE, ROLE.MGR, ROLE.APR, ROLE.REQ] },
+  {
+    k: 'master', label: 'Master', icon: 'fa-database', roles: [ROLE.MGR], kids: [
+      { k: 'master-employee', label: 'Employee' }, { k: 'master-vendor', label: 'Vendor' }, { k: 'master-category', label: 'Category' },
+      { k: 'master-priority', label: 'Priority' }, { k: 'master-status', label: 'Status' }, { k: 'master-currency', label: 'Currency' }, { k: 'master-recurring', label: 'Recurring Costs' }]
+  },
+  { k: 'request', label: 'Ticket Request', icon: 'fa-ticket', roles: [ROLE.REQ], assignKey: 'request' },
+  { k: 'manager', label: 'Admin Manager', icon: 'fa-user-tie', roles: [ROLE.MGR] },
+  { k: 'executive', label: 'Admin Executive', icon: 'fa-screwdriver-wrench', roles: [ROLE.EXE], assignKey: 'executive' },
+  { k: 'approval', label: 'Approval', icon: 'fa-stamp', roles: [ROLE.APR], assignKey: 'approval' },
+  {
+    k: 'reports', label: 'Reports', icon: 'fa-chart-column', roles: [ROLE.MGR, ROLE.REQ, ROLE.EXE, ROLE.APR], assignKey: 'reports', kids: [
+      { k: 'rep-progress', label: 'Tickets in Progress' }, { k: 'rep-closed', label: 'Closed Tickets' }, { k: 'rep-vendor', label: 'Vendor Wise Reports' },
+      { k: 'rep-category', label: 'Category Wise Reports' }, { k: 'rep-periodic', label: 'Periodic Report' }]
+  },
+  { k: 'settings', label: 'Settings', icon: 'fa-gear', roles: [ROLE.MGR] }
+];
+const PAGE_TITLE = { home: 'Home', 'master-employee': 'Employee Master', 'master-vendor': 'Vendor Master', 'master-category': 'Category Master', 'master-priority': 'Priority Master', 'master-status': 'Status Master', 'master-currency': 'Currency Master', 'master-recurring': 'Recurring Costs Master', request: 'Ticket Request', manager: 'Admin Manager', executive: 'Admin Executive', approval: 'Approval', 'rep-progress': 'Report: Tickets in Progress', 'rep-closed': 'Report: Closed Tickets', 'rep-vendor': 'Report: Vendor Wise', 'rep-category': 'Report: Category Wise', 'rep-periodic': 'Report: Periodic Report', settings: 'Settings' };
+const ROUTES = { home: renderHome, request: renderTicketRequest, manager: renderAdminManager, executive: renderAdminExecutive, approval: renderApproval, settings: renderSettings, 'rep-progress': () => renderReports('rep-progress'), 'rep-closed': () => renderReports('rep-closed'), 'rep-vendor': () => renderReports('rep-vendor'), 'rep-category': () => renderReports('rep-category'), 'rep-periodic': () => renderReports('rep-periodic') };
+['employee', 'vendor', 'category', 'priority', 'status', 'currency', 'recurring'].forEach(m => { ROUTES['master-' + m] = () => renderMaster(m); });
+function homeRouteFor() { return 'home'; }
+function menuAllowed(item) {
+  if (!item.roles) return true;
+  if (!item.roles.includes(ME.role)) return false;
+  if (item.assignKey) return hasMenu(item.assignKey);
+  return true;
+}
+function buildNav() {
+  const nav = $('#side'); nav.innerHTML = '';
+  MENU.forEach(item => {
+    if (item.roles && !menuAllowed(item)) return;
+    if (item.kids) {
+      const visibleKids = item.kids; if (!visibleKids.length) return;
+      const grp = document.createElement('div'); grp.className = 'grp'; grp.innerHTML = `<i class="ic fa-solid ${item.icon}"></i>${esc(item.label)}<span class="pm">+</span>`;
+      const sub = document.createElement('div'); sub.className = 'sub';
+      visibleKids.forEach(k => { const a = document.createElement('a'); a.href = 'javascript:void 0'; a.dataset.go = k.k; a.textContent = k.label; sub.appendChild(a); });
+      grp.onclick = () => { const open = sub.style.display !== 'none'; sub.style.display = open ? 'none' : ''; grp.querySelector('.pm').textContent = open ? '+' : '\u2212'; };
+      nav.appendChild(grp); nav.appendChild(sub);
+    } else {
+      const a = document.createElement('a'); a.href = 'javascript:void 0'; a.dataset.go = item.k; a.innerHTML = `<i class="ic fa-solid ${item.icon}"></i>${esc(item.label)}`; nav.appendChild(a);
+    }
+  });
+  nav.addEventListener('click', e => { const a = e.target.closest('[data-go]'); if (a) go(a.dataset.go); });
+}
+let CURRENT_ROUTE = null;
+let PENDING_GRID_FILTER = null; // set by Home's clickable stats; consumed once by the target screen's grid
+function applyPendingFilter(grid, host) {
+  if (!PENDING_GRID_FILTER || !grid) return;
+  const { key, value } = PENDING_GRID_FILTER; PENDING_GRID_FILTER = null;
+  grid.f[key] = value; grid.page = 1;
+  const sel = host ? host.querySelector(`select[data-f="${key}"]`) : null; if (sel) sel.value = value;
+  grid.draw();
+}
+function go(route) {
+  if (!ROUTES[route]) route = 'home';
+  const item = MENU.find(m => m.k === route) || MENU.flatMap(m => m.kids || []).find(k => k.k === route);
+  const parent = MENU.find(m => (m.kids || []).some(k => k.k === route));
+  const allowedTop = parent ? menuAllowed(parent) : (item ? menuAllowed(item) : true);
+  if (!allowedTop) { toast('You do not have access to that screen.', 'error'); route = 'home'; }
+  CURRENT_ROUTE = route;
+  $$('#side a').forEach(a => a.classList.toggle('active', a.dataset.go === route));
+  document.body.classList.remove('sb-open');
+  const crumb = parent ? `${parent.label} / ${PAGE_TITLE[route]}` : 'Home';
+  $('#main').innerHTML = `<div class="ph"><div><div class="crumb">${esc(crumb)}</div><h2>${esc(PAGE_TITLE[route] || '')}</h2></div></div><div id="pageBody"></div>`;
+  try { (ROUTES[route] || renderHome)(); } catch (e) { console.error(e); $('#pageBody').innerHTML = `<div class="card empty"><i class="fa-solid fa-triangle-exclamation"></i>Unable to load this screen.</div>`; }
+}
+
+/* ---------- header clock / calendar / user popover ---------- */
+let clockTimer = null;
+function startClocks() { renderHeaderClock(); updateOverdue(); clockTimer = setInterval(() => { renderHeaderClock(); if (CURRENT_ROUTE === 'home') tickHomeClock(); updateOverdue(); }, 1000); }
+function stopClocks() { if (clockTimer) clearInterval(clockTimer); clockTimer = null; }
+function renderHeaderClock() { const d = new Date(); $('#hdDate').textContent = fmtD(dstr(d), true); $('#hdClock').textContent = ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()); }
+$('#userChip').addEventListener('click', e => { if (e.target.closest('#uPop')) return; const p = $('#uPop'); p.classList.toggle('hidden'); if (!p.classList.contains('hidden')) renderUserPop(); });
+document.addEventListener('click', e => { if (!e.target.closest('#userChip')) $('#uPop').classList.add('hidden'); if (!e.target.closest('.menu-wrap')) $$('.menu').forEach(m => m.classList.add('hidden')); });
+function renderUserPop() {
+  $('#uPop').innerHTML = `<dl><dt>Name</dt><dd>${esc(ME.name || ME.username)}</dd><dt>Username</dt><dd>${esc(ME.username)}</dd><dt>Role</dt><dd>${esc(ME.role)}</dd>
+    <dt>Designation</dt><dd>${esc(ME.designation || '-')}</dd><dt>Branch</dt><dd>${esc(ME.branch || '-')}</dd><dt>Email</dt><dd>${esc(ME.email || '-')}</dd></dl>`;
+}
+$('#btnLogout').addEventListener('click', async () => { if (await confirmDlg({ title: 'Logout', message: 'Are you sure you want to logout?', confirmLabel: 'Logout' })) doLogout(); });
+$('#burger').addEventListener('click', () => { document.body.classList.toggle('sb-open'); if (window.innerWidth > 1279) document.body.classList.toggle('sb-hidden'); });
+$('#ovSide').addEventListener('click', () => document.body.classList.remove('sb-open'));
+
+/* ===================== HOME ===================== */
+function homeCounts() {
+  const mine = t => (ME.role === ROLE.REQ && t.requested_by === ME.emp_id) || (ME.role === ROLE.EXE && t.handler_id === ME.emp_id) || (ME.role === ROLE.APR && t.approver_id === ME.emp_id) || ME.role === ROLE.MGR;
+  const list = S.tickets.filter(mine);
+  return { active: list.filter(t => isActiveStatus(t.status)).length, overdue: list.filter(isOverdue).length, closed: list.filter(t => t.status === 'Closed').length };
+}
+function homeNavKeyForRole() {
+  if (ME.role === ROLE.MGR) return 'manager'; if (ME.role === ROLE.EXE) return 'executive'; if (ME.role === ROLE.APR) return 'approval'; return 'request';
+}
+function renderHome() {
+  const c = homeCounts();
+  $('#pageBody').innerHTML = `<div class="home-grid">
+    <div class="card welcome-c"><div class="welcome"><h2>Welcome, ${esc((ME.name || ME.username).split(' ')[0])}</h2><p>${esc(ME.role)} ${ME.designation ? '&middot; ' + esc(ME.designation) : ''}${ME.branch ? ' &middot; ' + esc(ME.branch) : ''}</p></div>
+      <div class="totals" style="margin-top:16px">
+        <div class="stat-click" data-stat="active" title="Go to my active tickets"><b>${c.active}</b><div class="mut">Active tickets</div></div>
+        <div class="stat-click" data-stat="overdue" title="Go to my overdue tickets"><b style="color:${c.overdue ? 'var(--danger)' : 'inherit'}">${c.overdue}</b><div class="mut">Overdue</div></div>
+        <div><b>${c.closed}</b><div class="mut">Closed</div></div>
+      </div>
+      <p class="mut" style="margin-top:14px">Use the left menu to open Ticket Request, Admin Manager, Admin Executive or Approval based on your role.</p></div>
+    <div class="card" id="homeCal"></div>
+    <div class="card clock-card" id="homeClock"><h3 style="align-self:flex-start;font-size:14px" class="mut">Current time</h3><div id="analog"></div><div class="digital" id="digital"></div></div>
+  </div>`;
+  renderCalendar($('#homeCal')); renderAnalogSkeleton($('#analog')); tickHomeClock();
+  $$('.stat-click', $('#pageBody')).forEach(el => el.addEventListener('click', () => {
+    PENDING_GRID_FILTER = el.dataset.stat === 'overdue' ? { key: 'due', value: 'over' } : null;
+    go(homeNavKeyForRole());
+  }));
+}
+function renderCalendar(host) {
+  const d = new Date(), y = d.getFullYear(), m = d.getMonth(), first = new Date(y, m, 1).getDay(), days = new Date(y, m + 1, 0).getDate(), prevDays = new Date(y, m, 0).getDate();
+  let html = `<div class="cal-h"><h3>${MON[m]} ${y}</h3><span class="mut" style="font-size:12px">Today: ${fmtD(dstr(d), true)}</span></div><table class="cal"><thead><tr>${['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(x => `<th>${x}</th>`).join('')}</tr></thead><tbody><tr>`;
+  let col = 0;
+  for (let i = first - 1; i >= 0; i--) { html += `<td class="dim">${prevDays - i}</td>`; col++; }
+  for (let dd = 1; dd <= days; dd++) { if (col === 7) { html += '</tr><tr>'; col = 0; } html += `<td class="${dd === d.getDate() ? 'today' : ''}">${dd}</td>`; col++; }
+  let next = 1; while (col < 7 && col !== 0) { html += `<td class="dim">${next++}</td>`; col++; }
+  html += '</tr></tbody></table>'; host.innerHTML = html;
+}
+function renderAnalogSkeleton(host) {
+  host.innerHTML = `<svg viewBox="0 0 140 140" width="140" height="140" aria-hidden="true">
+    <circle cx="70" cy="70" r="66" fill="#fff" stroke="var(--pri)" stroke-width="3"/>
+    ${Array.from({ length: 12 }).map((_, i) => { const a = i * 30 * Math.PI / 180, x1 = 70 + 56 * Math.sin(a), y1 = 70 - 56 * Math.cos(a), x2 = 70 + 62 * Math.sin(a), y2 = 70 - 62 * Math.cos(a); return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#4a5157" stroke-width="2"/>`; }).join('')}
+    <line id="hHand" x1="70" y1="70" x2="70" y2="40" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
+    <line id="mHand" x1="70" y1="70" x2="70" y2="25" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
+    <line id="sHand" x1="70" y1="70" x2="70" y2="18" stroke="var(--pri)" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="70" cy="70" r="3.5" fill="var(--pri)"/></svg>`;
+}
+function tickHomeClock() {
+  const el = $('#digital'); if (!el) return; const d = new Date();
+  el.textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  const h = d.getHours() % 12 + d.getMinutes() / 60, m = d.getMinutes() + d.getSeconds() / 60, s = d.getSeconds();
+  const set = (id, deg) => { const el2 = $('#' + id); if (el2) el2.setAttribute('transform', `rotate(${deg} 70 70)`); };
+  set('hHand', h * 30); set('mHand', m * 6); set('sHand', s * 6);
+}
+
+/* ===================== MASTERS ===================== */
+// Generic master engine driven by a small config per master. Admin Manager only.
+const MASTER_GRIDS = {};
+function inUseCheck(table, id, kind) {
+  if (table === 'categories') return S.vendors.some(v => v.category_id === id) || S.tickets.some(t => t.category_id === id);
+  if (table === 'vendors') return S.tickets.some(t => t.vendor_id === id) || S.recurring_master.some(r => r.vendor_id === id);
+  if (table === 'priorities') return S.tickets.some(t => t.priority_id === id);
+  if (table === 'currencies') return S.tickets.some(t => t.currency_id === id);
+  if (table === 'employees') return S.tickets.some(t => t.requested_by === id || t.approver_id === id || t.handler_id === id) || S.users.some(u => u.emp_id === id);
+  return false;
+}
+function master(entity) {
+  const M = {
+    employee: {
+      table: 'employees', title: 'Employee', entity: 'Employee', dupTip: 'Emp ID or Email already exists.',
+      cols: [
+        { k: 'emp_code', label: 'Emp ID', w: 9, sort: r => r.emp_code },
+        { k: 'name', label: 'Name', w: 15, sort: r => r.name },
+        { k: 'designation', label: 'Designation', w: 14 },
+        { k: 'branch', label: 'Branch', w: 10 },
+        { k: 'email', label: 'Email Address', w: 17 },
+        { k: 'mobile', label: 'Mobile No', w: 11 },
+        { k: 'user_type', label: 'User Type', w: 12, cell: r => `<span class="chip">${esc(r.user_type)}</span>` }
+      ],
+      filters: [{ k: 'user_type', label: 'User Type', opts: () => USER_TYPES.map(t => ({ v: t, t })), test: (r, v) => r.user_type === v }],
+      search: r => [r.emp_code, r.name, r.designation, r.branch, r.email, r.mobile].join(' '),
+      fields: [
+        { k: 'emp_code', label: 'Emp ID', req: true }, { k: 'name', label: 'Name', req: true },
+        { k: 'designation', label: 'Designation', req: true }, { k: 'branch', label: 'Branch', req: false },
+        { k: 'email', label: 'Email Address', req: true, type: 'email' }, { k: 'mobile', label: 'Mobile No', req: true, type: 'phone' },
+        { k: 'user_type', label: 'User Type', req: true, type: 'select', opts: () => USER_TYPES.map(t => ({ v: t, t })) }
+      ],
+      validate(f) {
+        const e = {}; if (!f.emp_code) e.emp_code = 'Emp ID is required.'; if (!f.name) e.name = 'Name is required.'; if (!f.designation) e.designation = 'Designation is required.';
+        if (!V.email(f.email)) e.email = 'Enter a valid email address.'; if (!V.phone(f.mobile)) e.mobile = 'Enter a valid mobile number.'; if (!USER_TYPES.includes(f.user_type)) e.user_type = 'Select a user type.'; return e;
+      },
+      template: () => ['Emp ID', 'Name', 'Designation', 'Branch', 'Email Address', 'Mobile No', 'User Type'],
+      sample: () => ['E010', 'Sample Name', 'Executive', 'Head Office', 'sample@example.com', '9800011122', 'Requestor'],
+      exportRow: r => [r.emp_code, r.name, r.designation, r.branch, r.email, r.mobile, r.user_type],
+      importCols: [{ key: 'emp_code', label: 'Emp ID', req: true }, { key: 'name', label: 'Name', req: true }, { key: 'designation', label: 'Designation', req: true },
+      { key: 'branch', label: 'Branch', req: false }, { key: 'email', label: 'Email Address', req: true, parse: s => V.email(s) ? { v: s } : { err: 'invalid email' } },
+      { key: 'mobile', label: 'Mobile No', req: true, parse: s => V.phone(s) ? { v: s } : { err: 'invalid mobile' } },
+      { key: 'user_type', label: 'User Type', req: true, parse: s => USER_TYPES.find(t => t.toLowerCase() === s.toLowerCase()) ? { v: USER_TYPES.find(t => t.toLowerCase() === s.toLowerCase()) } : { err: 'must be ' + USER_TYPES.join('/') } }],
+      dupKey: r => (r.emp_code || '').toLowerCase()
+    },
+    vendor: {
+      table: 'vendors', title: 'Vendor', entity: 'Vendor', dupTip: 'Vendor ID already exists.',
+      cols: [{ k: 'vendor_code', label: 'Vendor ID', w: 8 }, { k: 'name', label: 'Name', w: 13 }, { k: 'address', label: 'Address', w: 13 }, { k: 'city', label: 'City', w: 8 },
+      { k: 'email', label: 'Email Address', w: 14 }, { k: 'mobile', label: 'Mobile No', w: 9 }, { k: 'category_id', label: 'Category', w: 10, cell: r => esc((cat(r.category_id) || {}).name || '') },
+      { k: 'gst_no', label: 'GST No', w: 11 }],
+      filters: [{ k: 'category_id', label: 'Category', opts: () => S.categories.map(c => ({ v: c.id, t: c.name })), test: (r, v) => String(r.category_id) === v }],
+      search: r => [r.vendor_code, r.name, r.address, r.city, r.email, r.mobile, r.gst_no].join(' '),
+      fields: [{ k: 'vendor_code', label: 'Vendor ID', req: true }, { k: 'name', label: 'Name', req: true }, { k: 'address', label: 'Address', req: false },
+      { k: 'city', label: 'City', req: true }, { k: 'email', label: 'Email Address', req: true, type: 'email' }, { k: 'mobile', label: 'Mobile No', req: true, type: 'phone' },
+      { k: 'category_id', label: 'Category', req: true, type: 'select', opts: () => S.categories.map(c => ({ v: c.id, t: c.name })) }, { k: 'gst_no', label: 'GST No', req: false }],
+      validate(f) {
+        const e = {}; if (!f.vendor_code) e.vendor_code = 'Vendor ID is required.'; if (!f.name) e.name = 'Name is required.'; if (!f.city) e.city = 'City is required.';
+        if (!V.email(f.email)) e.email = 'Enter a valid email address.'; if (!V.phone(f.mobile)) e.mobile = 'Enter a valid mobile number.'; if (!f.category_id) e.category_id = 'Select a category.';
+        if (f.gst_no && !V.gst(f.gst_no)) e.gst_no = 'Enter a valid 15-character GST number.'; return e;
+      },
+      template: () => ['Vendor ID', 'Name', 'Address', 'City', 'Email Address', 'Mobile No', 'Category', 'GST No'],
+      sample: () => ['V010', 'Sample Vendor', '1 Main Street', 'Chennai', 'vendor@example.com', '9800022233', S.categories[0] ? S.categories[0].name : 'General', '33AAAAA0000A1Z5'],
+      exportRow: r => [r.vendor_code, r.name, r.address, r.city, r.email, r.mobile, (cat(r.category_id) || {}).name || '', r.gst_no],
+      importCols: [{ key: 'vendor_code', label: 'Vendor ID', req: true }, { key: 'name', label: 'Name', req: true }, { key: 'address', label: 'Address', req: false },
+      { key: 'city', label: 'City', req: true }, { key: 'email', label: 'Email Address', req: true, parse: s => V.email(s) ? { v: s } : { err: 'invalid email' } },
+      { key: 'mobile', label: 'Mobile No', req: true, parse: s => V.phone(s) ? { v: s } : { err: 'invalid mobile' } },
+      { key: 'category_id', label: 'Category', req: true, parse: s => { const c = byName('categories', s); return c ? { v: c.id } : { err: 'unknown category' }; } },
+      { key: 'gst_no', label: 'GST No', req: false, parse: s => !s || V.gst(s) ? { v: s.toUpperCase() } : { err: 'invalid GST' } }],
+      dupKey: r => (r.vendor_code || '').toLowerCase()
+    },
+    category: { table: 'categories', title: 'Category', entity: 'Category', simple: 'name', simpleLabel: 'Category', dupTip: 'Category already exists.' },
+    priority: {
+      table: 'priorities', title: 'Priority', entity: 'Priority', dupTip: 'Priority already exists.', noDeleteDefault: true,
+      cols: [{ k: 'name', label: 'Priority', w: 30 }, { k: 'code', label: 'Display Code', w: 24, cell: r => `<span class="pr pr-${esc(r.code)}">${esc(r.code)}</span>` }, { k: 'deadline_hours', label: 'Deadline to Complete', w: 34, cls: 'r', cell: r => r.deadline_hours + ' hour(s)' }],
+      search: r => [r.name, r.code].join(' '),
+      fields: [{ k: 'name', label: 'Priority', req: true }, { k: 'code', label: 'Display Code (single letter)', req: true, hint: 'Shown in grids, e.g. C, H, M, L' }, { k: 'deadline_hours', label: 'Deadline to Complete (hours)', req: true, type: 'number' }],
+      validate(f) { const e = {}; if (!f.name) e.name = 'Priority name is required.'; if (!/^[A-Za-z]$/.test(f.code || '')) e.code = 'Enter a single letter code.'; if (!(Number(f.deadline_hours) > 0)) e.deadline_hours = 'Enter deadline hours greater than 0.'; return e; },
+      beforeSave: f => { f.code = f.code.toUpperCase(); f.deadline_hours = Number(f.deadline_hours); },
+      template: () => ['Priority', 'Display Code', 'Deadline to Complete (hours)'], sample: () => ['Critical', 'C', '2'],
+      exportRow: r => [r.name, r.code, r.deadline_hours],
+      importCols: [{ key: 'name', label: 'Priority', req: true }, { key: 'code', label: 'Display Code', req: true, parse: s => /^[A-Za-z]$/.test(s) ? { v: s.toUpperCase() } : { err: 'must be a single letter' } }, { key: 'deadline_hours', label: 'Deadline to Complete (hours)', req: true, parse: s => /^\d+(\.\d+)?$/.test(s) && +s > 0 ? { v: +s } : { err: 'invalid number' } }],
+      dupKey: r => (r.name || '').toLowerCase()
+    },
+    status: { table: 'statuses', title: 'Status', entity: 'Status', simple: 'name', simpleLabel: 'Status', dupTip: 'Status already exists.', noDeleteIf: r => CORE_STATUSES.includes(r.name), noDeleteTip: 'Core workflow statuses cannot be deleted.' },
+    currency: { table: 'currencies', title: 'Currency', entity: 'Currency', simple: 'name', simpleLabel: 'Currency', dupTip: 'Currency already exists.' },
+    recurring: {
+      table: 'recurring_master', title: 'Recurring Costs', entity: 'RecurringCost', dupTip: 'A similar recurring item already exists.',
+      cols: [{ k: 'cost_name', label: 'Cost Name', w: 16 }, { k: 'location', label: 'Location', w: 12 }, { k: 'amount', label: 'Amount', w: 10, cls: 'r', cell: r => money(r.amount), sort: r => r.amount },
+      { k: 'due_date', label: 'Due Date', w: 10, cell: r => fmtD(r.due_date), sort: r => r.due_date }, { k: 'vendor_id', label: 'Vendor Name', w: 14, cell: r => esc((vendor(r.vendor_id) || {}).name || '') },
+      { k: 'end_date', label: 'End Date', w: 10, cell: r => r.end_date ? fmtD(r.end_date) : '<span class="mut">Ongoing</span>', sort: r => r.end_date || '' },
+      { k: 'status', label: 'Status', w: 8, cell: r => r.end_date && r.end_date < todayStr() ? stBadge('Closed') : '<span class="st" style="border-color:var(--pri-200);background:var(--pri-50)">Active</span>' }],
+      search: r => [r.cost_name, r.location].join(' '),
+      fields: [{ k: 'cost_name', label: 'Cost Name', req: true }, { k: 'location', label: 'Location', req: false },
+      { k: 'amount', label: 'Amount', req: true, type: 'number' }, { k: 'due_date', label: 'Due Date (first occurrence)', req: true, type: 'date' },
+      { k: 'vendor_id', label: 'Vendor Name', req: true, type: 'select', opts: () => S.vendors.map(v => ({ v: v.id, t: v.name })) },
+      { k: 'end_date', label: 'End Date (leave blank if ongoing)', req: false, type: 'date' }],
+      validate(f) {
+        const e = {}; if (!f.cost_name) e.cost_name = 'Cost Name is required.'; if (!V.money(f.amount) || Number(f.amount) <= 0) e.amount = 'Enter a valid amount.';
+        if (!V.date(f.due_date)) e.due_date = 'Enter a valid due date.'; if (!f.vendor_id) e.vendor_id = 'Select a vendor.';
+        if (f.end_date && !V.date(f.end_date)) e.end_date = 'Enter a valid end date.'; if (f.end_date && V.date(f.due_date) && f.end_date < f.due_date) e.end_date = 'End Date cannot be before Due Date.'; return e;
+      },
+      beforeSave: f => { f.amount = Number(f.amount); f.end_date = f.end_date || null; },
+      template: () => ['Cost Name', 'Location', 'Amount', 'Due Date (YYYY-MM-DD)', 'Vendor Name', 'End Date (YYYY-MM-DD, optional)'],
+      sample: () => ['Internet Charges', 'Head Office', '5000', todayStr(), S.vendors[0] ? S.vendors[0].name : 'Vendor Name', ''],
+      exportRow: r => [r.cost_name, r.location, r.amount, r.due_date, (vendor(r.vendor_id) || {}).name || '', r.end_date || ''],
+      importCols: [{ key: 'cost_name', label: 'Cost Name', req: true }, { key: 'location', label: 'Location', req: false },
+      { key: 'amount', label: 'Amount', req: true, parse: s => V.money(s) && +s > 0 ? { v: +s } : { err: 'invalid amount' } },
+      { key: 'due_date', label: 'Due Date', req: true, parse: s => { const d = parseDateFlex(s); return d ? { v: d } : { err: 'invalid date' }; } },
+      { key: 'vendor_id', label: 'Vendor Name', req: true, parse: s => { const v = byName('vendors', s); return v ? { v: v.id } : { err: 'unknown vendor' }; } },
+      { key: 'end_date', label: 'End Date', req: false, parse: s => { if (!s) return { v: null }; const d = parseDateFlex(s); return d ? { v: d } : { err: 'invalid date' }; } }],
+      dupKey: r => (r.cost_name + '|' + r.due_date).toLowerCase()
+    }
+  };
+  const cfg = M[entity];
+  if (cfg.simple) { // small single-field masters: Category / Status / Currency
+    cfg.cols = [{ k: 'name', label: cfg.simpleLabel, w: 70 }];
+    cfg.search = r => r.name; cfg.fields = [{ k: 'name', label: cfg.simpleLabel, req: true }];
+    cfg.validate = f => f.name ? {} : { name: cfg.simpleLabel + ' is required.' };
+    cfg.template = () => [cfg.simpleLabel]; cfg.sample = () => ['Sample ' + cfg.simpleLabel];
+    cfg.exportRow = r => [r.name]; cfg.importCols = [{ key: 'name', label: cfg.simpleLabel, req: true }]; cfg.dupKey = r => (r.name || '').toLowerCase();
+  }
+  return cfg;
+}
+function renderMaster(entity) {
+  requireRole(ROLE.MGR); const cfg = master(entity); const host = $('#pageBody');
+  host.innerHTML = `<div class="card"><div id="mgHost"></div></div>`;
+  const grid = new DataGrid({
+    columns: cfg.cols.concat([{ k: '_act', label: 'Actions', w: 12, cls: 'act', cell: r => ib('edit', r.id, 'fa-pen', 'Edit') + ib('del', r.id, 'fa-trash', 'Delete', { cls: 'del' }) }]),
+    getRows: () => S[cfg.table], searchText: cfg.search, filters: cfg.filters, searchPh: `Search ${cfg.title.toLowerCase()}...`, emptyMsg: `No ${cfg.title.toLowerCase()} records yet. Click Add to create one.`,
+    right: `<button class="btn sm" data-tool="tmpl" title="Download a blank file with correct column headings"><i class="fa-solid fa-file-arrow-down"></i> Sample Template</button>
+      <button class="btn sm" data-tool="import" title="Bulk upload from CSV/Excel"><i class="fa-solid fa-file-import"></i> Import</button>${exportBtn()}
+      <button class="btn sm primary" data-tool="add" title="Add new ${cfg.title.toLowerCase()}"><i class="fa-solid fa-plus"></i> Add</button>`,
+    onTool: (tool, btn) => {
+      if (tool === 'add') return openMasterForm(entity, null);
+      if (tool === 'tmpl') return downloadTemplate(cfg.table, cfg.template(), cfg.sample());
+      if (tool === 'import') return importMaster(entity);
+      if (tool === 'export-menu') return toggleExportMenu(btn);
+      if (tool === 'export-csv' || tool === 'export-xlsx') doExport(tool.split('-')[1], cfg.table, cfg.template(), S[cfg.table].map(cfg.exportRow), cfg.entity);
+    },
+    onAct: (act, id) => { const r = IDX[cfg.table].get(id); if (!r) return; if (act === 'edit') openMasterForm(entity, r); if (act === 'del') deleteMaster(entity, r); }
+  });
+  MASTER_GRIDS[entity] = grid; grid.mount($('#mgHost'));
+}
+function openMasterForm(entity, row) {
+  const cfg = master(entity), edit = !!row;
+  const inputHtml = f => {
+    const v = row ? row[f.k] : '';
+    if (f.type === 'select') return `<select class="sel" name="${f.k}">${optHtml(f.opts(), v, 'Select...')}</select>`;
+    if (f.type === 'number') return `<input class="inp" name="${f.k}" type="number" step="0.01" min="0" value="${esc(v ?? '')}">`;
+    if (f.type === 'date') return `<input class="inp" name="${f.k}" type="date" value="${esc(v || '')}">`;
+    return `<input class="inp" name="${f.k}" type="${f.type === 'email' ? 'email' : 'text'}" value="${esc(v ?? '')}" maxlength="120">`;
+  };
+  Modal.open({
+    title: (edit ? 'Edit ' : 'Add ') + cfg.title, escClose: false,
+    html: `<form id="mForm">${cfg.fields.map(f => fld(f.label, inputHtml(f), { req: f.req, k: f.k, hint: f.hint })).join('')}</form>`,
+    buttons: [{ label: 'Cancel' }, {
+      label: edit ? 'Save' : 'Add', cls: 'primary', icon: 'fa-floppy-disk', onClick: async ctx => {
+        const form = ctx.$('#mForm'); const f = {}; cfg.fields.forEach(x => f[x.k] = val(form, x.k));
+        const errs = cfg.validate(f); if (!showErrs(form, errs)) return false;
+        if (cfg.beforeSave) cfg.beforeSave(f);
+        try {
+          if (edit) { await DB.update(cfg.table, row.id, f); toast(cfg.title + ' updated.'); Audit.log('Edit', cfg.entity, f.name || f.emp_code || f.vendor_code || row.id, 'Updated'); }
+          else { const r = await DB.insert(cfg.table, f); toast(cfg.title + ' added.'); Audit.log('Create', cfg.entity, f.name || f.emp_code || f.vendor_code || r.id, 'Created'); }
+          await loadData([cfg.table]); renderMaster(entity);
+        } catch (e) { if (e instanceof DbError && e.code === 'DUP') { showErrs(form, { [cfg.fields[0].k]: cfg.dupTip }); return false; } toast(friendly(e), 'error'); return false; }
+      }
+    }]
+  });
+}
+async function deleteMaster(entity, row) {
+  const cfg = master(entity), label = row.name || row.emp_code || row.vendor_code || row.cost_name;
+  if (cfg.noDeleteDefault) { toast('Default priority levels cannot be deleted.', 'error'); return; }
+  if (cfg.noDeleteIf && cfg.noDeleteIf(row)) { toast(cfg.noDeleteTip, 'error'); return; }
+  if (inUseCheck(cfg.table, row.id)) { toast('This record is used by existing tickets/vendors and cannot be deleted.', 'error'); return; }
+  if (!await confirmDlg({ title: 'Delete ' + cfg.title, message: `Delete "${esc(label)}"? This cannot be undone.`, confirmLabel: 'Delete', danger: true })) return;
+  try { await DB.remove(cfg.table, row.id); await loadData([cfg.table]); toast(cfg.title + ' deleted.'); Audit.log('Delete', cfg.entity, label, 'Deleted'); renderMaster(entity); }
+  catch (e) { toast(e instanceof DbError && e.code === 'INUSE' ? 'This record is in use and cannot be deleted.' : friendly(e), 'error'); }
+}
+function importMaster(entity) {
+  const cfg = master(entity);
+  Importer.run({
+    entity: cfg.entity, title: cfg.title, columns: cfg.importCols, existing: () => new Set(S[cfg.table].map(cfg.dupKey)), dupKey: cfg.dupKey,
+    check: rec => { const errs = cfg.validate(rec); const k = Object.keys(errs); return k.length ? errs[k[0]] : null; },
+    insertOne: async rec => { if (cfg.beforeSave) cfg.beforeSave(rec); await DB.insert(cfg.table, rec); },
+    done: async () => { await loadData([cfg.table]); if (CURRENT_ROUTE === 'master-' + entity) renderMaster(entity); }
+  });
+}
+
+/* ===================== TICKET REQUEST (Requestor) ===================== */
+function ticketFieldsHtml(vals, opts) {
+  vals = vals || {}; opts = opts || {};
+  const showRequester = opts.showRequester;
+  return `<form id="tForm">
+    ${showRequester ? fld('Requested By', `<select class="sel" name="requested_by">${optHtml(S.employees.map(e => ({ v: e.id, t: e.name + ' (' + e.emp_code + ')' })), vals.requested_by, 'Select employee...')}</select>`, { req: true, k: 'requested_by' }) : ''}
+    <div class="row2">
+      ${fld('Category', `<select class="sel" name="category_id">${optHtml(S.categories.map(c => ({ v: c.id, t: c.name })), vals.category_id, 'Select category...')}</select>`, { req: true, k: 'category_id' })}
+      ${fld('Vendor', `<select class="sel" name="vendor_id">${optHtml(S.vendors.map(v => ({ v: v.id, t: v.name })), vals.vendor_id, 'Select vendor...')}</select>`, { req: true, k: 'vendor_id' })}
+    </div>
+    ${fld('Details', `<textarea class="txt" name="details" maxlength="250">${esc(vals.details || '')}</textarea><div class="cnt"><span id="detCnt">0</span>/250</div>`, { req: true, k: 'details' })}
+    <div class="row3">
+      ${fld('Currency', `<select class="sel" name="currency_id">${optHtml(S.currencies.map(c => ({ v: c.id, t: c.name })), vals.currency_id, null)}</select>`, { req: true, k: 'currency_id' })}
+      ${fld('Cost', `<input class="inp" name="cost" type="number" min="0" step="0.01" value="${esc(vals.cost ?? '')}">`, { req: true, k: 'cost' })}
+      ${fld('Priority', `<select class="sel" name="priority_id">${optHtml(S.priorities.map(p => ({ v: p.id, t: `${p.name} (${p.deadline_hours}h)` })), vals.priority_id, 'Select priority...')}</select>`, { req: true, k: 'priority_id' })}
+    </div>
+    <div class="chk"><label style="display:flex;align-items:center;gap:8px"><input type="checkbox" name="approval_required" id="ckAppr" ${vals.approval_required ? 'checked' : ''}> Approval Required?</label></div>
+    <div id="approverWrap" class="${vals.approval_required ? '' : 'hidden'}">${fld('Approver', `<select class="sel" name="approver_id">${optHtml(approvers().map(a => ({ v: a.id, t: a.name })), vals.approver_id, 'Select approver...')}</select>`, { k: 'approver_id', hint: 'Required when approval is needed.' })}</div>
+  </form>`;
+}
+function wireTicketForm(ctx) {
+  const form = ctx.$('#tForm'); const det = $('[name=details]', form), cnt = $('#detCnt', form);
+  const upd = () => cnt.textContent = det.value.length; det.addEventListener('input', upd); upd();
+  const ck = $('#ckAppr', form); ck.addEventListener('change', () => $('#approverWrap', form).classList.toggle('hidden', !ck.checked));
+}
+function readTicketForm(form, opts) {
+  const f = { category_id: +val(form, 'category_id') || null, vendor_id: +val(form, 'vendor_id') || null, details: val(form, 'details'), currency_id: +val(form, 'currency_id') || null, cost: val(form, 'cost'), priority_id: +val(form, 'priority_id') || null, approval_required: $('[name=approval_required]', form).checked, approver_id: +val(form, 'approver_id') || null };
+  if (opts && opts.showRequester) f.requested_by = +val(form, 'requested_by') || null;
+  return f;
+}
+function validateTicketForm(f, opts) {
+  const e = {}; if (opts && opts.showRequester && !f.requested_by) e.requested_by = 'Select the requesting employee.';
+  if (!f.category_id) e.category_id = 'Select a category.'; if (!f.vendor_id) e.vendor_id = 'Select a vendor.';
+  if (!f.details) e.details = 'Details are required.'; else if (f.details.length > 250) e.details = 'Maximum 250 characters allowed.';
+  if (!f.currency_id) e.currency_id = 'Select a currency.'; if (!V.money(f.cost) || Number(f.cost) < 0) e.cost = 'Enter a valid cost (up to 2 decimal places).';
+  if (!f.priority_id) e.priority_id = 'Select a priority.'; if (f.approval_required && !f.approver_id) e.approver_id = 'Select an approver.'; return e;
+}
+function renderTicketRequest() {
+  requireRole(ROLE.REQ); const host = $('#pageBody'); host.innerHTML = `<div class="card"><div id="reqHost"></div></div>`;
+  const mine = () => S.tickets.filter(t => t.requested_by === ME.emp_id);
+  const grid = new DataGrid({
+    columns: [
+      { k: 'request_no', label: 'Request No', w: 11, cell: r => esc(r.request_no || ''), sort: r => r.request_no || '' },
+      { k: 'request_date', label: 'Date', w: 10, cell: r => fmtD(r.request_date), sort: r => r.request_date },
+      { k: 'request_time', label: 'Time', w: 9, cell: r => fmtT(r.request_time) },
+      { k: 'category_id', label: 'Category', w: 16, cell: r => esc((cat(r.category_id) || {}).name || '') },
+      { k: 'details', label: 'Details', w: 8, cls: 'c', cell: r => ib('view', r.id, 'fa-eye', 'View full details') },
+      { k: 'priority_id', label: 'Priority', w: 10, cls: 'c', cell: priBadge, sort: priRank },
+      { k: 'status', label: 'Status', w: 16, cell: r => stBadge(r.status), sort: r => r.status },
+      { k: '_act', label: 'Actions', w: 14, cls: 'act', cell: r => ib('edit', r.id, 'fa-pen', 'Edit', { dis: r.status !== 'Draft', disTip: 'Only Draft requests can be edited' }) + ib('del', r.id, 'fa-trash', 'Delete', { cls: 'del', dis: r.status !== 'Draft', disTip: 'Only Draft requests can be deleted' }) }
+    ],
+    getRows: mine, searchText: r => [r.request_no, (cat(r.category_id) || {}).name, r.details, r.status].join(' '),
+    filters: [{ k: 'status', label: 'Status', opts: () => S.statuses.map(s => ({ v: s.name, t: s.name })), test: (r, v) => r.status === v },
+      { k: 'due', label: 'Deadline', opts: () => [{ v: 'over', t: 'Overdue only' }], test: r => isOverdue(r) }],
+    rowAttrs: dueAttr,
+    defaultCmp: (a, b) => new Date(b.created_at) - new Date(a.created_at), searchPh: 'Search my requests...', emptyMsg: 'You have not raised any ticket requests yet.',
+    right: `<button class="btn sm" data-tool="tmpl"><i class="fa-solid fa-file-arrow-down"></i> Sample Template</button><button class="btn sm" data-tool="import"><i class="fa-solid fa-file-import"></i> Import</button>${exportBtn()}<button class="btn sm primary" data-tool="add"><i class="fa-solid fa-plus"></i> New Request</button>`,
+    onTool: (tool, btn) => {
+      if (tool === 'add') return openRequestForm(null);
+      if (tool === 'tmpl') return downloadTemplate('ticket_request', ['Category', 'Vendor', 'Details', 'Currency', 'Cost', 'Priority', 'Approval Required (Yes/No)'], [S.categories[0] ? S.categories[0].name : '', S.vendors[0] ? S.vendors[0].name : '', 'Sample request details', 'INR', '1000', 'Medium', 'No']);
+      if (tool === 'import') return importRequests();
+      if (tool === 'export-menu') return toggleExportMenu(btn);
+      if (tool === 'export-csv' || tool === 'export-xlsx') doExport(tool.split('-')[1], 'ticket_requests', ['Request No', 'Date', 'Time', 'Category', 'Details', 'Vendor', 'Currency', 'Cost', 'Priority', 'Status'], mine().map(r => [r.request_no, r.request_date, r.request_time, (cat(r.category_id) || {}).name, r.details, (vendor(r.vendor_id) || {}).name, (cur(r.currency_id) || {}).name, r.cost, (pri(r.priority_id) || {}).name, r.status]), 'TicketRequest');
+    },
+    onAct: async (act, id) => {
+      const t = IDX.tickets.get(id); if (!t) return;
+      if (act === 'view') return viewTicketModal(t);
+      if (act === 'edit') { if (t.status !== 'Draft') return toast('Only Draft requests can be edited.', 'error'); return openRequestForm(t); }
+      if (act === 'del') {
+        if (t.status !== 'Draft') return toast('Only Draft requests can be deleted.', 'error');
+        if (!await confirmDlg({ title: 'Delete Request', message: `Delete request ${esc(t.request_no)}? This cannot be undone.`, confirmLabel: 'Delete', danger: true })) return;
+        try { await deleteTicket(t); await loadData(TICKET_TABLES); toast('Request deleted.'); renderTicketRequest(); } catch (e) { toast(friendly(e), 'error'); }
+      }
+    }
+  });
+  grid.mount($('#reqHost'));
+  applyPendingFilter(grid, $('#reqHost'));
+}
+function openRequestForm(row) {
+  const edit = !!row;
+  Modal.open({
+    title: edit ? 'Edit Ticket Request' : 'New Ticket Request', size: 'lg', escClose: false,
+    html: ticketFieldsHtml(row || { currency_id: (S.currencies[0] || {}).id }), onMount: wireTicketForm,
+    buttons: [{ label: 'Cancel' }, {
+      label: edit ? 'Save Changes' : 'Submit Request', cls: 'primary', icon: 'fa-paper-plane', onClick: async ctx => {
+        const form = ctx.$('#tForm'); const f = readTicketForm(form); const errs = validateTicketForm(f);
+        if (!showErrs(form, errs)) return false;
+        try {
+          if (edit) { await updateTicketFields(row, f); toast('Request updated.'); } else { f.requested_by = ME.emp_id; const t = await createTicket(f, 'Request'); toast('Request submitted as ' + t.request_no + '.'); }
+          await loadData(TICKET_TABLES); renderTicketRequest();
+        } catch (e) { toast(friendly(e), 'error'); return false; }
+      }
+    }]
+  });
+}
+function importRequests() {
+  Importer.run({
+    entity: 'TicketRequest', title: 'Ticket Request',
+    columns: [{ key: 'category', label: 'Category', req: true }, { key: 'vendor', label: 'Vendor', req: true }, { key: 'details', label: 'Details', req: true },
+    { key: 'currency', label: 'Currency', req: true }, { key: 'cost', label: 'Cost', req: true }, { key: 'priority', label: 'Priority', req: true }, { key: 'appr', label: 'Approval Required', req: false }],
+    check: rec => rec.details && rec.details.length > 250 ? 'Details exceeds 250 characters' : null,
+    insertOne: async rec => {
+      const cId = byName('categories', rec.category), vId = byName('vendors', rec.vendor), curId = byName('currencies', rec.currency), pId = byName('priorities', rec.priority);
+      if (!cId) throw new AppError('Unknown category: ' + rec.category); if (!vId) throw new AppError('Unknown vendor: ' + rec.vendor);
+      if (!curId) throw new AppError('Unknown currency: ' + rec.currency); if (!pId) throw new AppError('Unknown priority: ' + rec.priority);
+      if (!V.money(rec.cost)) throw new AppError('Invalid cost'); const appr = /^y/i.test(rec.appr || '');
+      await createTicket({ requested_by: ME.emp_id, category_id: cId.id, vendor_id: vId.id, details: rec.details, currency_id: curId.id, cost: rec.cost, priority_id: pId.id, approval_required: appr, approver_id: appr ? (approvers()[0] || {}).id : null }, 'Request');
+    },
+    done: async () => { await loadData(TICKET_TABLES); if (CURRENT_ROUTE === 'request') renderTicketRequest(); }
+  });
+}
+function detailsBtnCell(r) { return `${ib('view', r.id, 'fa-eye', 'View full details')}`; }
+function viewTicketModal(t) {
+  Modal.open({
+    title: 'Ticket Details - ' + (t.ticket_no || t.request_no), size: 'md', escClose: true,
+    html: `<dl class="dgrid">
+      ${t.ticket_no ? `<dt>Ticket No</dt><dd>${esc(t.ticket_no)}</dd>` : ''}${t.request_no ? `<dt>Request No</dt><dd>${esc(t.request_no)}</dd>` : ''}
+      <dt>Requested By</dt><dd>${esc(requestorName(t))}</dd><dt>Date / Time</dt><dd>${esc(fmtD(t.request_date, true))} ${esc(fmtT(t.request_time))}</dd>
+      <dt>Category</dt><dd>${esc((cat(t.category_id) || {}).name || '')}</dd><dt>Vendor</dt><dd>${esc((vendor(t.vendor_id) || {}).name || '')}</dd>
+      <dt>Cost</dt><dd>${esc((cur(t.currency_id) || {}).name || '')} ${money(t.cost)}</dd><dt>Priority</dt><dd>${priBadge(t)} ${esc((pri(t.priority_id) || {}).name || '')}</dd>
+      <dt>Approval</dt><dd>${apBadge(t)} ${t.approval_required ? esc(t.approval_status) + (t.approver_id ? ' - ' + esc(empName(t.approver_id)) : '') : 'Not required'}</dd>
+      <dt>Assigned To</dt><dd>${esc(empName(t.handler_id)) || '<span class="mut">Not assigned</span>'}</dd><dt>Status</dt><dd>${stBadge(t.status)}</dd>
+      <dt>Source</dt><dd>${esc(t.source)}</dd></dl><div class="sect">Details</div><div class="dbox">${esc(t.details)}</div>
+      ${renderHistoryMini(t)}`,
+    buttons: [{ label: 'Close', cls: 'primary' }]
+  });
+}
+function renderHistoryMini(t) {
+  const hist = S.ticket_status_history.filter(h => h.ticket_id === t.id).sort((a, b) => new Date(a.changed_at) - new Date(b.changed_at));
+  const cm = S.ticket_comments.filter(c => c.ticket_id === t.id).sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+  let html = '';
+  if (hist.length) html += `<div class="sect">Status History</div><table class="mini"><thead><tr><th>From</th><th>To</th><th>By</th><th>When</th><th>Comments</th></tr></thead><tbody>${hist.map(h => `<tr><td>${esc(h.prev_status || '-')}</td><td>${stBadge(h.new_status)}</td><td>${esc(h.changed_by_name)}</td><td>${esc(fmtDT(h.changed_at))}</td><td>${esc(h.comments || '')}</td></tr>`).join('')}</tbody></table>`;
+  if (cm.length) html += `<div class="sect">Comments</div>${cm.map(c => `<div class="cm">${esc(c.comment)}<br><small>${esc(c.author_name)} &middot; ${esc(fmtDT(c.created_at))}</small></div>`).join('')}`;
+  return html;
+}
+
+/* ===================== ADMIN MANAGER ===================== */
+let mgrGrid = null;
+function mgrRows() { return S.tickets.filter(t => t.status !== 'Closed' && t.status !== 'Rejected'); }
+function renderAdminManager() {
+  requireRole(ROLE.MGR); const host = $('#pageBody');
+  host.innerHTML = `<div class="card"><div id="mgrHost"></div></div>`;
+  mgrGrid = new DataGrid({
+    pageSize: 15,
+    columns: [
+      { k: 'ticket_no', label: 'Ticket #', w: 7, cell: r => esc(r.ticket_no), sort: r => r.ticket_no },
+      { k: 'request_no', label: 'Req ID', w: 6, cell: r => r.request_no || '<span class="mut">-</span>' },
+      { k: 'requested_by', label: 'Requestor', w: 8, cell: r => esc(requestorName(r)) },
+      { k: 'request_date', label: 'Date', w: 6, cell: r => fmtD(r.request_date) },
+      { k: 'request_time', label: 'Time', w: 5, cell: r => fmtT(r.request_time) },
+      { k: 'category_id', label: 'Category', w: 7, cell: r => esc((cat(r.category_id) || {}).name || '') },
+      { k: 'vendor_id', label: 'Vendor', w: 7, cell: r => esc((vendor(r.vendor_id) || {}).name || '') },
+      { k: 'priority_id', label: 'Priority', w: 5, cls: 'c', cell: priBadge, sort: priRank },
+      { k: 'cost', label: 'Cost', w: 7, cls: 'r', cell: costCell, sort: r => r.cost },
+      { k: 'approval_required', label: 'Approved?', w: 6, cls: 'c', cell: apBadge },
+      { k: 'approver_id', label: 'Approver', w: 8, cell: r => approverCell(r) },
+      { k: 'handler_id', label: 'Handler', w: 8, cell: r => handlerCell(r) },
+      { k: 'status', label: 'Status', w: 8, cell: r => statusCell(r, ROLE.MGR) },
+      { k: 'details', label: 'Details', w: 5, cls: 'c', cell: r => ib('view', r.id, 'fa-eye', 'View full details') },
+      { k: '_act', label: 'Actions', w: 7, cls: 'act', cell: mgrActionsCell }
+    ],
+    getRows: mgrRows, rowAttrs: dueAttr, searchText: r => [r.ticket_no, r.request_no, requestorName(r), (cat(r.category_id) || {}).name, (vendor(r.vendor_id) || {}).name, r.details, r.status].join(' '),
+    filters: [
+      { k: 'status', label: 'Status', opts: () => S.statuses.map(s => ({ v: s.name, t: s.name })), test: (r, v) => r.status === v },
+      { k: 'priority_id', label: 'Priority', opts: () => S.priorities.map(p => ({ v: p.id, t: p.name })), test: (r, v) => String(r.priority_id) === v },
+      { k: 'due', label: 'Deadline', opts: () => [{ v: 'over', t: 'Overdue only' }], test: r => isOverdue(r) }
+    ],
+    defaultCmp: ticketCmp, searchPh: 'Search tickets...', emptyMsg: 'No active tickets. New requests and manual tickets will appear here.',
+    right: `<button class="btn sm" data-tool="tmpl"><i class="fa-solid fa-file-arrow-down"></i> Sample Template</button><button class="btn sm" data-tool="import"><i class="fa-solid fa-file-import"></i> Import</button>${exportBtn()}<button class="btn sm primary" data-tool="add"><i class="fa-solid fa-plus"></i> Create Ticket</button>`,
+    onTool: (tool, btn) => {
+      if (tool === 'add') return openManualTicketForm();
+      if (tool === 'tmpl') return downloadTemplate('manual_tickets', ['Requested By (Emp ID)', 'Category', 'Vendor', 'Details', 'Currency', 'Cost', 'Priority', 'Approval Required (Yes/No)', 'Approver (Emp ID)'], [S.employees[0] ? S.employees[0].emp_code : '', S.categories[0] ? S.categories[0].name : '', S.vendors[0] ? S.vendors[0].name : '', 'Sample ticket details', 'INR', '1000', 'Medium', 'No', '']);
+      if (tool === 'import') return importManagerTickets();
+      if (tool === 'export-menu') return toggleExportMenu(btn);
+      if (tool === 'export-csv' || tool === 'export-xlsx') doExport(tool.split('-')[1], 'admin_manager_tickets', ['Ticket #', 'Req ID', 'Requestor', 'Date', 'Time', 'Category', 'Vendor', 'Priority', 'Cost', 'Approved?', 'Approver', 'Handler', 'Status', 'Details'], mgrRows().map(mgrExportRow), 'Ticket');
+    },
+    onAct: mgrAction, onChange: mgrChange
+  });
+  mgrGrid.mount($('#mgrHost'));
+  applyPendingFilter(mgrGrid, $('#mgrHost'));
+}
+function mgrExportRow(r) { return [r.ticket_no, r.request_no || '', requestorName(r), r.request_date, fmtT(r.request_time), (cat(r.category_id) || {}).name, (vendor(r.vendor_id) || {}).name, (pri(r.priority_id) || {}).name, r.cost, r.approval_required ? (({ Approved: 'A', Rejected: 'R', Pending: 'P' })[r.approval_status] || 'N') : 'N/A', empName(r.approver_id), empName(r.handler_id), r.status, r.details]; }
+function approverCell(r) {
+  if (!r.approval_required) return '<span class="mut">-</span>';
+  const editable = approverEditable(r);
+  return `<select class="sel-i" data-chg="approver" data-id="${r.id}" ${editable ? '' : 'disabled'} title="${editable ? 'Change approver' : 'Cannot change approver at this stage'}">
+    <option value="">Select...</option>${approvers().map(a => `<option value="${a.id}" ${a.id === r.approver_id ? 'selected' : ''}>${esc(firstName(a.name))}</option>`).join('')}</select>`;
+}
+function handlerCell(r) {
+  const lock = handlerLockReason(r);
+  return `<select class="sel-i" data-chg="handler" data-id="${r.id}" ${lock ? 'disabled' : ''} title="${esc(lock || 'Assign to Admin Executive')}">
+    <option value="">${lock ? 'Locked' : 'Assign...'}</option>${executives().map(x => `<option value="${x.id}" ${x.id === r.handler_id ? 'selected' : ''}>${esc(firstName(x.name))}</option>`).join('')}</select>`;
+}
+function statusCell(r, role) {
+  const opts = nextStatuses(role, r);
+  return `<select class="sel-i" data-chg="status" data-id="${r.id}" ${opts.length ? '' : 'disabled'} title="Change status">
+    <option value="${esc(r.status)}">${esc(r.status)}</option>${opts.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('')}</select>`;
+}
+function mgrActionsCell(r) {
+  const canSend = ROLE.MGR && r.approval_required && !!r.approver_id && ['Draft', 'New'].includes(r.status) && !['Pending', 'Approved'].includes(r.approval_status);
+  return ib('send', r.id, 'fa-paper-plane', 'Send for approval', { dis: !canSend, disTip: canSend ? 'Send for approval' : 'Not applicable at this stage' })
+    + ib('edit', r.id, 'fa-pen', 'Edit ticket', { dis: !['Draft', 'New'].includes(r.status), disTip: 'Editable only while Draft/New' })
+    + ib('del', r.id, 'fa-trash', 'Delete ticket', { cls: 'del', dis: !canDeleteTicket(r), disTip: 'Only Draft/New tickets can be deleted' });
+}
+async function mgrChange(kind, id, sel) {
+  const t = IDX.tickets.get(id); if (!t) return; const prevHtml = sel.innerHTML;
+  try {
+    if (kind === 'approver') { if (!sel.value) return; await setApprover(t, +sel.value); toast('Approver updated.'); }
+    if (kind === 'handler') { if (!sel.value) return; await assignExec(t, +sel.value); toast('Ticket assigned to ' + firstName(empName(+sel.value)) + '.'); }
+    if (kind === 'status') {
+      if (sel.value === t.status) return;
+      if (sel.value === 'Rejected') { const c = await promptText({ title: 'Reject Ticket', label: 'Reason for rejection', confirmLabel: 'Reject', danger: true }); if (c == null) { sel.value = t.status; return; } await changeStatus(t, 'Rejected', c); }
+      else await changeStatus(t, sel.value, null);
+      toast('Status updated to ' + sel.value + '.');
+    }
+    await loadData(TICKET_TABLES); if (CURRENT_ROUTE === 'manager') mgrGrid.draw(); else if (CURRENT_ROUTE === 'executive') exeGrid && exeGrid.draw();
+  } catch (e) { sel.innerHTML = prevHtml; toast(friendly(e), 'error'); }
+}
+async function mgrAction(act, id) {
+  const t = IDX.tickets.get(id); if (!t) return;
+  if (act === 'view') return viewTicketModal(t);
+  if (act === 'edit') return openManagerEditForm(t);
+  if (act === 'send') {
+    if (!await confirmDlg({ title: 'Send for Approval', message: `Send ticket ${esc(t.ticket_no)} to ${esc(empName(t.approver_id))} for approval?`, confirmLabel: 'Send' })) return;
+    try { await sendForApproval(t); await loadData(TICKET_TABLES); toast('Sent for approval.'); mgrGrid.draw(); } catch (e) { toast(friendly(e), 'error'); }
+  }
+  if (act === 'del') {
+    if (!canDeleteTicket(t)) return toast('Only Draft or New tickets can be deleted.', 'error');
+    if (!await confirmDlg({ title: 'Delete Ticket', message: `Delete ticket ${esc(t.ticket_no)}? This cannot be undone.`, confirmLabel: 'Delete', danger: true })) return;
+    try { await deleteTicket(t); await loadData(TICKET_TABLES); toast('Ticket deleted.'); mgrGrid.draw(); } catch (e) { toast(friendly(e), 'error'); }
+  }
+}
+function openManualTicketForm() {
+  Modal.open({
+    title: 'Create Ticket', size: 'lg', escClose: false,
+    html: ticketFieldsHtml({ currency_id: (S.currencies[0] || {}).id }, { showRequester: true }), onMount: wireTicketForm,
+    buttons: [{ label: 'Cancel' }, {
+      label: 'Create Ticket', cls: 'primary', icon: 'fa-plus', onClick: async ctx => {
+        const form = ctx.$('#tForm'); const f = readTicketForm(form, { showRequester: true }); const errs = validateTicketForm(f, { showRequester: true });
+        if (!showErrs(form, errs)) return false;
+        try { const t = await createTicket(f, 'Manual'); toast('Ticket ' + t.ticket_no + ' created.'); await loadData(TICKET_TABLES); mgrGrid.draw(); }
+        catch (e) { toast(friendly(e), 'error'); return false; }
+      }
+    }]
+  });
+}
+function openManagerEditForm(t) {
+  Modal.open({
+    title: 'Edit Ticket - ' + t.ticket_no, size: 'lg', escClose: false,
+    html: ticketFieldsHtml(t, { showRequester: true }), onMount: wireTicketForm,
+    buttons: [{ label: 'Cancel' }, {
+      label: 'Save Changes', cls: 'primary', icon: 'fa-floppy-disk', onClick: async ctx => {
+        const form = ctx.$('#tForm'); const f = readTicketForm(form, { showRequester: true }); const errs = validateTicketForm(f, { showRequester: true });
+        if (!showErrs(form, errs)) return false;
+        try { await updateTicketFields(t, f); toast('Ticket updated.'); await loadData(TICKET_TABLES); mgrGrid.draw(); } catch (e) { toast(friendly(e), 'error'); return false; }
+      }
+    }]
+  });
+}
+function importManagerTickets() {
+  Importer.run({
+    entity: 'Ticket', title: 'Manual Ticket',
+    columns: [{ key: 'emp', label: 'Requested By (Emp ID)', req: true }, { key: 'category', label: 'Category', req: true }, { key: 'vendor', label: 'Vendor', req: true },
+    { key: 'details', label: 'Details', req: true }, { key: 'currency', label: 'Currency', req: true }, { key: 'cost', label: 'Cost', req: true },
+    { key: 'priority', label: 'Priority', req: true }, { key: 'appr', label: 'Approval Required', req: false }, { key: 'approver', label: 'Approver', req: false }],
+    check: rec => rec.details && rec.details.length > 250 ? 'Details exceeds 250 characters' : null,
+    insertOne: async rec => {
+      const e = S.employees.find(x => x.emp_code.toLowerCase() === (rec.emp || '').toLowerCase()), cId = byName('categories', rec.category), vId = byName('vendors', rec.vendor), curId = byName('currencies', rec.currency), pId = byName('priorities', rec.priority);
+      if (!e) throw new AppError('Unknown Emp ID: ' + rec.emp); if (!cId) throw new AppError('Unknown category'); if (!vId) throw new AppError('Unknown vendor'); if (!curId) throw new AppError('Unknown currency'); if (!pId) throw new AppError('Unknown priority');
+      if (!V.money(rec.cost)) throw new AppError('Invalid cost'); const appr = /^y/i.test(rec.appr || '');
+      let apId = null; if (appr) { const ap = S.employees.find(x => x.emp_code.toLowerCase() === (rec.approver || '').toLowerCase() && x.user_type === ROLE.APR); if (!ap) throw new AppError('Unknown/invalid approver Emp ID'); apId = ap.id; }
+      await createTicket({ requested_by: e.id, category_id: cId.id, vendor_id: vId.id, details: rec.details, currency_id: curId.id, cost: rec.cost, priority_id: pId.id, approval_required: appr, approver_id: apId }, 'Manual');
+    },
+    done: async () => { await loadData(TICKET_TABLES); if (CURRENT_ROUTE === 'manager') renderAdminManager(); }
+  });
+}
+
+/* ===================== ADMIN EXECUTIVE ===================== */
+let exeGrid = null;
+function renderAdminExecutive() {
+  requireRole(ROLE.EXE); const host = $('#pageBody'); host.innerHTML = `<div class="card"><div id="exeHost"></div></div>`;
+  const rows = () => S.tickets.filter(t => t.handler_id === ME.emp_id && isActiveStatus(t.status));
+  exeGrid = new DataGrid({
+    columns: [
+      { k: 'ticket_no', label: 'Ticket No', w: 9, cell: r => esc(r.ticket_no), sort: r => r.ticket_no },
+      { k: 'received', label: 'Received Date', w: 9, cell: r => fmtD(receivedAt(r)), sort: r => receivedAt(r) },
+      { k: 'received_t', label: 'Received Time', w: 8, cell: r => receivedTime(r) },
+      { k: 'category_id', label: 'Category', w: 10, cell: r => esc((cat(r.category_id) || {}).name || '') },
+      { k: 'details', label: 'Details', w: 6, cls: 'c', cell: r => ib('view', r.id, 'fa-eye', 'View full details') },
+      { k: 'vendor_id', label: 'Vendor', w: 10, cell: r => esc((vendor(r.vendor_id) || {}).name || '') },
+      { k: 'cost', label: 'Cost', w: 9, cls: 'r', cell: costCell, sort: r => r.cost },
+      { k: 'comments', label: 'Comments', w: 13, cell: exeCommentCell },
+      { k: 'priority_id', label: 'Priority', w: 6, cls: 'c', cell: priBadge, sort: priRank },
+      { k: 'status', label: 'Status', w: 12, cell: r => statusCell(r, ROLE.EXE) },
+      { k: '_act', label: 'Actions', w: 8, cls: 'act', cell: r => ib('comment', r.id, 'fa-comment', 'Add / view comment') }
+    ],
+    getRows: rows, rowAttrs: dueAttr, searchText: r => [r.ticket_no, (cat(r.category_id) || {}).name, r.details, r.status].join(' '),
+    filters: [{ k: 'priority_id', label: 'Priority', opts: () => S.priorities.map(p => ({ v: p.id, t: p.name })), test: (r, v) => String(r.priority_id) === v },
+      { k: 'due', label: 'Deadline', opts: () => [{ v: 'over', t: 'Overdue only' }], test: r => isOverdue(r) }],
+    defaultCmp: ticketCmp, searchPh: 'Search my tickets...', emptyMsg: 'No tickets are currently assigned to you.',
+    right: exportBtn(),
+    onTool: (tool, btn) => {
+      if (tool === 'export-menu') return toggleExportMenu(btn);
+      if (tool === 'export-csv' || tool === 'export-xlsx') doExport(tool.split('-')[1], 'my_assigned_tickets', ['Ticket No', 'Received Date', 'Received Time', 'Category', 'Vendor', 'Cost', 'Priority', 'Status', 'Details'], rows().map(r => [r.ticket_no, receivedAt(r), receivedTime(r), (cat(r.category_id) || {}).name, (vendor(r.vendor_id) || {}).name, r.cost, (pri(r.priority_id) || {}).name, r.status, r.details]), 'Ticket');
+    },
+    onAct: async (act, id) => { const t = IDX.tickets.get(id); if (!t) return; if (act === 'view') return viewTicketModal(t); if (act === 'comment') return exeCommentDialog(t); },
+    onChange: mgrChange
+  });
+  exeGrid.mount($('#exeHost'));
+  applyPendingFilter(exeGrid, $('#exeHost'));
+}
+function receivedAssign(t) { return S.ticket_assignments.filter(a => a.ticket_id === t.id).sort((a, b) => new Date(b.assigned_at) - new Date(a.assigned_at))[0]; }
+function receivedAt(t) { const a = receivedAssign(t); return a ? dstr(new Date(a.assigned_at)) : t.request_date; }
+function receivedTime(t) { const a = receivedAssign(t); return a ? tstr(new Date(a.assigned_at)).slice(0, 5) : fmtT(t.request_time); }
+function exeCommentCell(r) { const c = LAST.comment.get(r.id); return c ? `<span title="${esc(c.comment)}">${esc(c.comment.slice(0, 28))}${c.comment.length > 28 ? '…' : ''}</span>` : '<span class="mut">-</span>'; }
+async function exeCommentDialog(t) {
+  const c = await promptText({ title: 'Ticket ' + t.ticket_no + ' - Comment', label: 'Comment', required: true, confirmLabel: 'Save' });
+  if (c == null) return;
+  try { await addComment(t, c); await loadData(TICKET_TABLES); toast('Comment saved.'); exeGrid.draw(); } catch (e) { toast(friendly(e), 'error'); }
+}
+
+/* ===================== APPROVER ===================== */
+let aprGrid = null;
+function renderApproval() {
+  requireRole(ROLE.APR); const host = $('#pageBody'); host.innerHTML = `<div class="card"><div id="aprHost"></div></div>`;
+  const rows = () => S.tickets.filter(t => t.approver_id === ME.emp_id && t.status === 'Pending Approval');
+  aprGrid = new DataGrid({
+    columns: [
+      { k: 'ticket_no', label: 'Ticket No', w: 9, cell: r => esc(r.ticket_no), sort: r => r.ticket_no },
+      { k: 'requested_by', label: 'Requested By', w: 10, cell: r => esc(requestorName(r)) },
+      { k: 'request_date', label: 'Request Date', w: 9, cell: r => fmtD(r.request_date), sort: r => r.request_date },
+      { k: 'request_time', label: 'Request Time', w: 8, cell: r => fmtT(r.request_time) },
+      { k: 'category_id', label: 'Category', w: 10, cell: r => esc((cat(r.category_id) || {}).name || '') },
+      { k: 'details', label: 'Details', w: 6, cls: 'c', cell: r => ib('view', r.id, 'fa-eye', 'View full details') },
+      { k: 'vendor_id', label: 'Vendor', w: 10, cell: r => esc((vendor(r.vendor_id) || {}).name || '') },
+      { k: 'cost', label: 'Cost', w: 9, cls: 'r', cell: costCell, sort: r => r.cost },
+      { k: 'priority_id', label: 'Priority', w: 6, cls: 'c', cell: priBadge, sort: priRank },
+      { k: 'approval_status', label: 'Action Status', w: 8, cell: apBadge },
+      { k: '_act', label: 'Actions', w: 13, cls: 'act', cell: r => ib('approve', r.id, 'fa-check', 'Approve') + ib('reject', r.id, 'fa-xmark', 'Reject', { cls: 'del' }) }
+    ],
+    getRows: rows, rowAttrs: dueAttr, searchText: r => [r.ticket_no, requestorName(r), (cat(r.category_id) || {}).name, r.details].join(' '),
+    defaultCmp: ticketCmp, searchPh: 'Search pending approvals...', emptyMsg: 'No tickets are waiting for your approval.',
+    filters: [{ k: 'due', label: 'Deadline', opts: () => [{ v: 'over', t: 'Overdue only' }], test: r => isOverdue(r) }],
+    right: exportBtn(),
+    onTool: (tool, btn) => {
+      if (tool === 'export-menu') return toggleExportMenu(btn);
+      if (tool === 'export-csv' || tool === 'export-xlsx') doExport(tool.split('-')[1], 'pending_approvals', ['Ticket No', 'Requested By', 'Request Date', 'Request Time', 'Category', 'Vendor', 'Cost', 'Priority', 'Action Status'], rows().map(r => [r.ticket_no, requestorName(r), r.request_date, fmtT(r.request_time), (cat(r.category_id) || {}).name, (vendor(r.vendor_id) || {}).name, r.cost, (pri(r.priority_id) || {}).name, r.approval_status]), 'Approval');
+    },
+    onAct: async (act, id) => {
+      const t = IDX.tickets.get(id); if (!t) return;
+      if (act === 'view') return viewTicketModal(t);
+      if (act === 'approve') {
+        const c = await promptText({ title: 'Approve Ticket ' + t.ticket_no, label: 'Comments (optional)', required: false, confirmLabel: 'Approve' });
+        if (c === null) return; try { await decideApproval(t, 'Approved', c); await loadData(TICKET_TABLES); toast('Ticket approved.'); aprGrid.draw(); } catch (e) { toast(friendly(e), 'error'); }
+      }
+      if (act === 'reject') {
+        const c = await promptText({ title: 'Reject Ticket ' + t.ticket_no, label: 'Reason for rejection', required: true, confirmLabel: 'Reject', danger: true });
+        if (c == null) return; try { await decideApproval(t, 'Rejected', c); await loadData(TICKET_TABLES); toast('Ticket rejected.'); aprGrid.draw(); } catch (e) { toast(friendly(e), 'error'); }
+      }
+    }
+  });
+  aprGrid.mount($('#aprHost'));
+  applyPendingFilter(aprGrid, $('#aprHost'));
+}
+
+/* ===================== REPORTS ===================== */
+function repFilterBar(fields, onApply, onReset) {
+  return `<div class="card rep-filters">${fields}
+    <button class="btn sm primary" id="repApply"><i class="fa-solid fa-magnifying-glass"></i> Apply</button>
+    <button class="btn sm" id="repReset"><i class="fa-solid fa-filter-circle-xmark"></i> Reset</button></div>`;
+}
+function weekRange(d) { const s = new Date(d); s.setDate(s.getDate() - s.getDay()); const e = new Date(s); e.setDate(e.getDate() + 6); return [dstr(s), dstr(e)]; }
+function inRange(dateStr, from, to) { return (!from || dateStr >= from) && (!to || dateStr <= to); }
+function renderReports(kind) {
+  if (!hasMenu('reports')) { toast('You do not have access to Reports.', 'error'); return go('home'); }
+  const host = $('#pageBody');
+  if (kind === 'rep-vendor' || kind === 'rep-category') return renderLedgerReport(host, kind);
+  if (kind === 'rep-closed') return renderClosedReport(host);
+  if (kind === 'rep-progress') return renderProgressReport(host);
+  if (kind === 'rep-periodic') return renderPeriodicReport(host);
+}
+function renderLedgerReport(host, kind) {
+  const isVendor = kind === 'rep-vendor'; const optRows = isVendor ? S.vendors : S.categories;
+  host.innerHTML = repFilterBar(
+    `${fld(isVendor ? 'Vendor' : 'Category', `<select class="sel" id="fEntity">${optHtml(optRows.map(x => ({ v: x.id, t: x.name })), '', 'All')}</select>`)}
+     ${fld('Date From', `<input class="inp" id="fFrom" type="date">`)}${fld('Date To', `<input class="inp" id="fTo" type="date">`)}`)
+    + `<div class="card" id="repRes"></div>`;
+  const run = () => {
+    const eid = $('#fEntity').value, from = $('#fFrom').value, to = $('#fTo').value;
+    let rows = S.tickets.filter(t => inRange(t.request_date, from, to));
+    if (eid) rows = rows.filter(t => String(isVendor ? t.vendor_id : t.category_id) === eid);
+    rows = rows.slice().sort((a, b) => b.request_date.localeCompare(a.request_date));
+    const total = rows.reduce((s, t) => s + Number(t.cost || 0), 0);
+    $('#repRes').innerHTML = `<div class="gtool"><span class="mut">${rows.length} ticket(s)</span><div class="gr">${exportBtn()}</div></div>
+      <div class="totals"><div>Total Cost<b>${money(total)}</b></div></div>
+      <div class="tbl-wrap" style="max-height:420px"><table class="tbl"><thead><tr><th style="width:9%">Ticket #</th><th style="width:9%">Date</th><th style="width:12%">${isVendor ? 'Category' : 'Vendor'}</th><th style="width:9%">Cost</th><th style="width:7%">Priority</th><th style="width:9%">Status</th><th>Details</th></tr></thead>
+      <tbody>${rows.length ? rows.map(t => `<tr><td>${esc(t.ticket_no)}</td><td>${fmtD(t.request_date)}</td><td>${esc(isVendor ? (cat(t.category_id) || {}).name : (vendor(t.vendor_id) || {}).name || '')}</td><td>${costCell(t)}</td><td class="c">${priBadge(t)}</td><td>${stBadge(t.status)}</td><td>${esc(t.details)}</td></tr>`).join('') : `<tr><td colspan="7" class="empty"><i class="fa-regular fa-folder-open"></i>No records for the selected filters.</td></tr>`}</tbody></table></div>`;
+    $('[data-tool=export-menu]', $('#repRes')).parentElement.addEventListener('click', e => { const t = e.target.closest('[data-tool]'); if (!t) return; if (t.dataset.tool === 'export-menu') toggleExportMenu(t); else if (t.dataset.tool.startsWith('export-')) doExport(t.dataset.tool.split('-')[1], (isVendor ? 'vendor' : 'category') + '_ledger', ['Ticket #', 'Date', isVendor ? 'Category' : 'Vendor', 'Cost', 'Priority', 'Status', 'Details'], rows.map(r => [r.ticket_no, r.request_date, isVendor ? (cat(r.category_id) || {}).name : (vendor(r.vendor_id) || {}).name, r.cost, (pri(r.priority_id) || {}).name, r.status, r.details]), 'Report'); });
+  };
+  $('#repApply').onclick = run; $('#repReset').onclick = () => { $('#fEntity').value = ''; $('#fFrom').value = ''; $('#fTo').value = ''; run(); }; run();
+}
+function renderClosedReport(host) {
+  host.innerHTML = repFilterBar(`${fld('Date From', `<input class="inp" id="fFrom" type="date">`)}${fld('Date To', `<input class="inp" id="fTo" type="date">`)}${fld('Category', `<select class="sel" id="fCat">${optHtml(S.categories.map(c => ({ v: c.id, t: c.name })), '', 'All')}</select>`)}`)
+    + `<div class="card" id="repRes"></div>`;
+  const run = () => {
+    const from = $('#fFrom').value, to = $('#fTo').value, cid = $('#fCat').value;
+    let rows = S.tickets.filter(t => t.status === 'Closed' && inRange(dstr(new Date(t.closed_at || t.updated_at)), from, to));
+    if (cid) rows = rows.filter(t => String(t.category_id) === cid);
+    rows.sort((a, b) => new Date(b.closed_at || b.updated_at) - new Date(a.closed_at || a.updated_at));
+    drawSimpleTicketTable(rows, 'closed_tickets');
+  };
+  $('#repApply').onclick = run; $('#repReset').onclick = () => { $('#fFrom').value = ''; $('#fTo').value = ''; $('#fCat').value = ''; run(); }; run();
+}
+function renderProgressReport(host) {
+  host.innerHTML = repFilterBar(`${fld('Status', `<select class="sel" id="fSt"><option value="">All active</option>${S.statuses.filter(s => isActiveStatus(s.name)).map(s => `<option value="${esc(s.name)}">${esc(s.name)}</option>`).join('')}</select>`)}${fld('Priority', `<select class="sel" id="fPr">${optHtml(S.priorities.map(p => ({ v: p.id, t: p.name })), '', 'All')}</select>`)}`)
+    + `<div class="card" id="repRes"></div>`;
+  const run = () => {
+    const st = $('#fSt').value, pid = $('#fPr').value;
+    let rows = S.tickets.filter(t => isActiveStatus(t.status)); if (st) rows = rows.filter(t => t.status === st); if (pid) rows = rows.filter(t => String(t.priority_id) === pid);
+    rows.sort(ticketCmp); drawSimpleTicketTable(rows, 'live_tickets');
+  };
+  $('#repApply').onclick = run; $('#repReset').onclick = () => { $('#fSt').value = ''; $('#fPr').value = ''; run(); }; run();
+}
+function drawSimpleTicketTable(rows, exportName) {
+  const total = rows.reduce((s, t) => s + Number(t.cost || 0), 0);
+  $('#repRes').innerHTML = `<div class="gtool"><span class="mut">${rows.length} ticket(s)</span><div class="gr">${exportBtn()}</div></div><div class="totals"><div>Total Cost<b>${money(total)}</b></div></div>
+    <div class="tbl-wrap" style="max-height:420px"><table class="tbl"><thead><tr><th style="width:8%">Ticket #</th><th style="width:9%">Requestor</th><th style="width:8%">Date</th><th style="width:10%">Category</th><th style="width:10%">Vendor</th><th style="width:8%">Cost</th><th style="width:6%">Priority</th><th style="width:9%">Status</th><th>Details</th></tr></thead>
+    <tbody>${rows.length ? rows.map(t => `<tr${dueAttr(t)}><td>${esc(t.ticket_no)}</td><td>${esc(requestorName(t))}</td><td>${fmtD(t.request_date)}</td><td>${esc((cat(t.category_id) || {}).name || '')}</td><td>${esc((vendor(t.vendor_id) || {}).name || '')}</td><td>${costCell(t)}</td><td class="c">${priBadge(t)}</td><td>${stBadge(t.status)}</td><td>${esc(t.details)}</td></tr>`).join('') : `<tr><td colspan="9" class="empty"><i class="fa-regular fa-folder-open"></i>No records for the selected filters.</td></tr>`}</tbody></table></div>`;
+  $('[data-tool=export-menu]', $('#repRes')).parentElement.addEventListener('click', e => { const t = e.target.closest('[data-tool]'); if (!t) return; if (t.dataset.tool === 'export-menu') toggleExportMenu(t); else if (t.dataset.tool.startsWith('export-')) doExport(t.dataset.tool.split('-')[1], exportName, ['Ticket #', 'Requestor', 'Date', 'Category', 'Vendor', 'Cost', 'Priority', 'Status', 'Details'], rows.map(r => [r.ticket_no, requestorName(r), r.request_date, (cat(r.category_id) || {}).name, (vendor(r.vendor_id) || {}).name, r.cost, (pri(r.priority_id) || {}).name, r.status, r.details]), 'Report'); });
+  updateOverdue();
+}
+function renderPeriodicReport(host) {
+  host.innerHTML = repFilterBar(`${fld('Period', `<select class="sel" id="fPeriod"><option value="week">Weekly (this week)</option><option value="month">Monthly (this month)</option></select>`)}`) + `<div class="card" id="repRes"></div>`;
+  const run = () => {
+    const period = $('#fPeriod').value; const now = new Date(); let from, to, label;
+    if (period === 'week') { [from, to] = weekRange(now); label = `Week of ${fmtD(from, true)} - ${fmtD(to, true)}`; }
+    else { from = dstr(new Date(now.getFullYear(), now.getMonth(), 1)); to = dstr(new Date(now.getFullYear(), now.getMonth() + 1, 0)); label = MON[now.getMonth()] + ' ' + now.getFullYear(); }
+    const rows = S.tickets.filter(t => inRange(t.request_date, from, to));
+    const byStatus = {}; CORE_STATUSES.forEach(s => byStatus[s] = 0); rows.forEach(t => byStatus[t.status] = (byStatus[t.status] || 0) + 1);
+    const total = rows.reduce((s, t) => s + Number(t.cost || 0), 0);
+    $('#repRes').innerHTML = `<h3 style="margin-bottom:10px">${esc(label)}</h3><div class="totals"><div>Total Tickets<b>${rows.length}</b></div><div>Total Cost<b>${money(total)}</b></div></div>
+      <table class="sum-tbl"><thead><tr><th>Status</th><th>Count</th></tr></thead><tbody>${CORE_STATUSES.map(s => `<tr><td>${stBadge(s)}</td><td>${byStatus[s] || 0}</td></tr>`).join('')}</tbody></table>
+      <div class="gtool"><div class="gr">${exportBtn()}</div></div>`;
+    $('[data-tool=export-menu]', $('#repRes')).parentElement.addEventListener('click', e => { const t = e.target.closest('[data-tool]'); if (!t) return; if (t.dataset.tool === 'export-menu') toggleExportMenu(t); else if (t.dataset.tool.startsWith('export-')) doExport(t.dataset.tool.split('-')[1], 'periodic_report_' + period, ['Ticket #', 'Requestor', 'Date', 'Category', 'Vendor', 'Cost', 'Priority', 'Status'], rows.map(r => [r.ticket_no, requestorName(r), r.request_date, (cat(r.category_id) || {}).name, (vendor(r.vendor_id) || {}).name, r.cost, (pri(r.priority_id) || {}).name, r.status]), 'Report'); });
+  };
+  $('#repApply').onclick = run; $('#repReset').onclick = () => { $('#fPeriod').value = 'week'; run(); }; run();
+}
+
+/* ===================== SETTINGS ===================== */
+function renderSettings() {
+  requireRole(ROLE.MGR); const host = $('#pageBody'); const conn = getConn(); const mode = connMode();
+  host.innerHTML = `<div class="set-grid">
+    <div class="card"><h3><i class="fa-solid fa-database"></i> Database Connection</h3>
+      <p class="mut" style="margin-top:0">Currently running in <b>${mode === 'cloud' ? 'Cloud (Supabase)' : 'Local Demo'}</b> mode.</p>
+      <form id="frmConn">
+        ${fld('Mode', `<select class="sel" name="mode"><option value="auto" ${conn.mode !== 'demo' ? 'selected' : ''}>Use cloud database if configured</option><option value="demo" ${conn.mode === 'demo' ? 'selected' : ''}>Force local demo mode</option></select>`)}
+        ${fld('Supabase / API URL', `<input class="inp" name="url" placeholder="https://xxxx.supabase.co" value="${esc(conn.url || '')}">`)}
+        ${fld('Public anon key', `<input class="inp" name="key" placeholder="Public anon/publishable key only" value="${esc(conn.key || '')}">`, { hint: 'Never paste a service-role/secret key here.' })}
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" type="button" id="btnTest"><i class="fa-solid fa-plug"></i> Test Connection</button><button class="btn primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save &amp; Reload</button></div>
+      </form><div id="connMsg" style="margin-top:10px"></div></div>
+    <div class="card"><h3><i class="fa-solid fa-sliders"></i> Workflow Configuration</h3>
+      <form id="frmWf">${fld('Default Priority for recurring tickets', `<select class="sel" name="rec_priority_id">${optHtml(S.priorities.map(p => ({ v: p.id, t: p.name })), setting('rec_priority_id'), null)}</select>`)}
+      ${fld('Default Currency for recurring tickets', `<select class="sel" name="rec_currency_id">${optHtml(S.currencies.map(c => ({ v: c.id, t: c.name })), setting('rec_currency_id'), null)}</select>`)}
+      <button class="btn primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save</button></form></div>
+    <div class="card"><h3><i class="fa-solid fa-database"></i> Demo Data</h3><p class="mut" style="margin-top:0">Demo records are clearly marked and can be removed once you enter real master data.</p>
+      <button class="btn" id="btnRemoveDemo" ${DB.hasDemo() ? '' : 'disabled'}><i class="fa-solid fa-broom"></i> Remove Demo Data</button>
+      ${DB.mode === 'demo' ? '<button class="btn" id="btnResetDemo" style="margin-left:8px"><i class="fa-solid fa-rotate-left"></i> Reset Demo Data</button>' : ''}</div>
+  </div>
+  <div class="card"><h3><i class="fa-solid fa-users-gear"></i> User / Session Management</h3><div id="userMgmt"></div></div>`;
+  $('#frmConn').addEventListener('submit', async e => {
+    e.preventDefault(); const f = e.target, url = val(f, 'url').trim(), key = val(f, 'key').trim(), m = val(f, 'mode');
+    if (key && isSecretKey(key)) { $('#connMsg').innerHTML = `<div class="bad-msg">This looks like a private/service-role key. Only the public anon key may be used here.</div>`; return; }
+    localStorage.setItem(APP_CONFIG.CONN_KEY, JSON.stringify({ mode: m, url, key, prefix: APP_CONFIG.API_PREFIX }));
+    toast('Connection settings saved. Reloading...'); Audit.log('Settings', 'Database', '', 'Connection settings updated'); setTimeout(() => location.reload(), 700);
+  });
+  $('#btnTest').onclick = async () => {
+    $('#connMsg').innerHTML = '<span class="spin"></span> Testing...';
+    const url = val($('#frmConn'), 'url').trim(), key = val($('#frmConn'), 'key').trim(), m = val($('#frmConn'), 'mode');
+    try {
+      let r;
+      if (m !== 'demo' && url && key && !isSecretKey(key)) {
+        const probe = Object.create(CloudDB); probe.cfg = () => ({ base: url.replace(/\/+$/, '') + APP_CONFIG.API_PREFIX, key });
+        r = await probe.testConnection();
+      } else r = await LocalDB.testConnection();
+      $('#connMsg').innerHTML = `<div class="${r.ok ? 'ok-msg' : 'bad-msg'}">${esc(r.msg)}</div>`;
+    } catch (e) { $('#connMsg').innerHTML = `<div class="bad-msg">${esc(friendly(e))}</div>`; }
+  };
+  $('#frmWf').addEventListener('submit', async e => { e.preventDefault(); const f = e.target; await saveSetting('rec_priority_id', val(f, 'rec_priority_id')); await saveSetting('rec_currency_id', val(f, 'rec_currency_id')); await loadData(['app_settings']); toast('Workflow settings saved.'); });
+  $('#btnRemoveDemo').onclick = async () => { if (!await confirmDlg({ title: 'Remove Demo Data', message: 'Remove all demo-marked records (employees, vendors, categories, tickets, recurring items)? This cannot be undone.', confirmLabel: 'Remove', danger: true })) return; await DB.removeDemo(); await loadData(); toast('Demo data removed.'); renderSettings(); };
+  const rd = $('#btnResetDemo'); if (rd) rd.onclick = async () => { if (!await confirmDlg({ title: 'Reset Demo Data', message: 'Reset local demo data to its original state? All current data in this browser will be lost.', confirmLabel: 'Reset', danger: true })) return; await DB.resetDemo(); await loadData(); toast('Demo data reset.'); renderSettings(); };
+  renderUserMgmt();
+}
+function accessSummary(u) {
+  if (u.role === ROLE.MGR) return '<span class="mut">All menus (Admin Manager)</span>';
+  const acc = effectiveAccess(u), cands = MENU_CANDIDATES[u.role] || [];
+  const on = cands.filter(c => acc.includes(c.k));
+  return on.length ? on.map(c => `<span class="chip">${esc(c.label)}</span>`).join(' ') : '<span class="mut">No menu access</span>';
+}
+async function renderUserMgmt() {
+  const host = $('#userMgmt'); host.innerHTML = '<div class="loading"><span class="spin"></span> Loading users...</div>';
+  let users; try { users = await DB.listUsers(); } catch (e) { host.innerHTML = `<div class="empty">${esc(friendly(e))}</div>`; return; }
+  host.innerHTML = `<div class="tbl-wrap" style="max-height:340px"><table class="tbl"><thead><tr><th style="width:11%">Username</th><th style="width:13%">Name</th><th style="width:9%">Role</th><th style="width:8%">Status</th><th style="width:10%">Last Login</th><th style="width:17%">Menu Access</th><th style="width:9%">Reset Req.</th><th style="width:23%">Actions</th></tr></thead>
+    <tbody>${users.map(u => `<tr><td>${esc(u.username)}</td><td>${esc(u.name || '')}</td><td><span class="chip">${esc(u.role || '')}</span></td><td>${u.locked ? '<span class="st st-Rejected">Locked</span>' : (u.active ? '<span class="st st-Approved">Active</span>' : '<span class="st st-Draft">Disabled</span>')}</td><td>${u.last_login ? esc(fmtDT(u.last_login)) : '<span class="mut">Never</span>'}</td><td>${accessSummary(u)}</td><td>${u.reset_requested ? '<span class="st st-Pending">Yes</span>' : ''}</td><td class="act">${ib('pin', u.id, 'fa-key', 'Reset PIN')}${ib(u.active ? 'off' : 'on', u.id, u.active ? 'fa-lock' : 'fa-lock-open', u.active ? 'Disable user' : 'Enable user')}${u.role === ROLE.MGR ? '' : ib('menu', u.id, 'fa-sliders', 'Edit menu access')}</td></tr>`).join('')}</tbody></table></div>`;
+  if (host.dataset.bound) return;
+  host.dataset.bound = '1';
+  host.addEventListener('click', async e => {
+    const b = e.target.closest('[data-act]'); if (!b) return; const id = +b.dataset.id;
+    if (b.dataset.act === 'pin') {
+      const pinModal = await new Promise(res => Modal.open({
+        title: 'Reset PIN', size: 'sm', html: `<div class="field"><label>New 4-digit PIN <span class="req">*</span></label><input class="inp" name="npin" maxlength="4" inputmode="numeric"><div class="err" data-e="npin"></div></div>`,
+        buttons: [{ label: 'Cancel', onClick: () => res(null) }, { label: 'Reset', cls: 'primary', onClick: ctx => { const p = val(ctx.el, 'npin'); if (!V.pin(p)) { showErrs(ctx.el, { npin: 'Enter exactly 4 digits.' }); return false; } res(p); } }]
+      }));
+      if (pinModal) { await DB.resetPin(id, pinModal); toast('PIN reset.'); Audit.log('ResetPin', 'User', id, 'PIN reset by manager'); renderUserMgmt(); }
+    } else if (b.dataset.act === 'off' || b.dataset.act === 'on') {
+      await DB.setUserActive(id, b.dataset.act === 'on'); toast('User ' + (b.dataset.act === 'on' ? 'enabled' : 'disabled') + '.'); Audit.log('UserStatus', 'User', id, b.dataset.act); renderUserMgmt();
+    } else if (b.dataset.act === 'menu') {
+      const users2 = await DB.listUsers(); const u = users2.find(x => x.id === id); if (u) openMenuAccessModal(u);
+    }
+  });
+}
+function openMenuAccessModal(u) {
+  const cands = MENU_CANDIDATES[u.role] || []; const acc = effectiveAccess(u);
+  Modal.open({
+    title: 'Menu Access - ' + u.username, size: 'sm', escClose: false,
+    html: `<p class="mut" style="margin-top:0">Choose which menus <b>${esc(u.name || u.username)}</b> (${esc(u.role)}) can access. Unchecking a menu hides it immediately for that user.</p>
+      <form id="maForm">${cands.map(c => `<label class="chk"><input type="checkbox" name="m_${c.k}" ${acc.includes(c.k) ? 'checked' : ''}> ${esc(c.label)}</label>`).join('')}</form>`,
+    buttons: [{ label: 'Cancel' }, {
+      label: 'Save', cls: 'primary', icon: 'fa-floppy-disk', onClick: async ctx => {
+        const arr = cands.filter(c => $(`[name=m_${c.k}]`, ctx.el).checked).map(c => c.k);
+        try { await DB.setMenuAccess(u.id, arr); toast('Menu access updated.'); Audit.log('MenuAccess', 'User', u.username, arr.join(',') || '(none)'); renderUserMgmt(); }
+        catch (e) { toast(friendly(e), 'error'); return false; }
+      }
+    }]
+  });
+}
+
+/* ===================== STARTUP ===================== */
+tryRestore();
+</script>
+</body>
+</html>
