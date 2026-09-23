@@ -7,6 +7,12 @@
 <!-- Icons: Font Awesome (CDN). If it cannot load, buttons fall back to text labels. -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" onerror="document.documentElement.classList.add('no-fa')">
 <!-- Optional: SheetJS enables Excel (.xlsx) import/export. CSV always works without it. -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://envhowhvirabfupaeaoz.supabase.co/rest/v1/';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVudmhvd2h2aXJhYmZ1cGFlYW96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxNzkyMjAsImV4cCI6MjEwNTc1NTIyMH0.TMIFa-mRdLFrE9U4sTxbIzL0A_FXd4PZALlQDCJNiH0';
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
 <style>
 :root{
